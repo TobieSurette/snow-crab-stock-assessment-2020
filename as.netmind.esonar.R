@@ -1,15 +1,15 @@
 as.netmind.esonar <- function(x){
    # AS.NETMIND - Convert an 'esonar' object to a 'netmind' object.
-   
-   # Define common variables:
+
+   # Define variables:
    vars <- c("year", "month", "day", "hour", "minute", "second", "longitude", "latitude", "speed", "depth")
 
    z <- x[vars]
-   z$primary <- round(x$headline*10)/10
-   z$doorspread <- round(x$doormaster*10)/10
-   z$depth <- round(x$depth*10)/10
+   z$primary <- round(x$headline, 1)
+   z$doorspread <- round(x$doormaster, 1)/
+   z$depth <- round(x$depth, 1)0
    z$secondary <- NA
-   
+
    # Build a header for the Netmind object:
    if (!("file.name" %in% names(x))){
       temp <- header(x)
@@ -32,7 +32,7 @@ as.netmind.esonar <- function(x){
       header$tow.id    <- x$tow.id
       header$FileName <- paste(" ", header$file.name, sep = "")
       header$"Local Time" <- paste(" ", as.character(time(x[1, ])), sep= "")
-      
+
       tow.id <- unlist(lapply(strsplit(x$file, "/", fixed = TRUE), function(x) x[length(x)]))
       tow.id <- unlist(lapply(strsplit(tow.id, ".", fixed = TRUE), function(x) x[1]))
       header$Ship <-  paste(" ", as.character(date(x)), " Trip: ", tow.id, " Tow: tow ",  x$tow.number, sep = "")
@@ -52,6 +52,6 @@ as.netmind.esonar <- function(x){
    # Convert to 'netmind':
    class(z) <- "data.frame"
    z <- netmind(z)
-   
+
    return(z)
 }
