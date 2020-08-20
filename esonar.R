@@ -14,17 +14,15 @@
 #' @param path Logical value specifying whether to include the path in the Minilog files.
 #'
 #' @examples
-#' # eSonar files for the 2000 September RV survey:
-#' esonar.file(survey = "rv", year = 2000)
+#' # eSonar files for the 2020 snow crab survey:
+#' locate.esonar(year = 2020)
 #'
 #' # Use a tow ID to extract file names for the snow crab survey 2006-2012:
-#' esonar.file("GP001", year = 2006:2012)
+#' locate.esonar("GP001", year = 2018:2020)
 #'
 #' # Use a set card extract for the first ten sets of 2012:
 #' x <- read.gulf(year = 2012, survey = "sc")
 #' minilog.file(x[1:10, ])
-#'
-
 #'
 #' x <- read.minilog(tow.id = "GP001F", year = 2010)
 #' x <- read.minilog(survey = "rv", year = 2010)
@@ -47,13 +45,16 @@ esonar.default <- function(x, header, ...){
    if (!("esonar" %in% class(x))) class(x) <- c("esonar", class(x))
 
    # Add header:
-   if (!missing(header)) attributes(x) <- c(attributes(x), header)
+   if (!missing(header)) header(x) <- header
+
+   # Assign key:
+   key.esonar <- function(x) v <- c("year", "month", "day", "hour", "minute", "second")
 
    return(x)
 }
 
 #' @export
-locate.esonar <- function(x, year, tow.id, full.names = TRUE, ...){
+locate.esonar <- function(x, year, tow.id, full.names = TRUE, remove = "test", ...){
    # Parse 'x' argument:
    if (!missing(x)){
       if (is.numeric(x)) year <- x
@@ -82,23 +83,27 @@ locate.esonar <- function(x, year, tow.id, full.names = TRUE, ...){
       tow.id <- as.character(tow.id)
       index <- NULL
       for (i in 1:length(tow.id)) index <- c(index, grep(tolower(tow.id[i]), tolower(files)))
-      files <- unique(files[index])
    }
 
    # Remove path:
    if (!full.names) files <- unlist(lapply(strsplit(files, "/", fixed = TRUE), function(x) x[length(x)]))
 
-   # Remove test trials:
-   if (length(files) > 0){
-      index <- grep("test", tolower(files))
+   # Remove files:
+   if (!missing(remove)) remove <- remove[remove != "" & !is.na(remove)]
+   if ((length(files) > 0) & (length(remove) > 0)) {
+      index <- NULL
+      for (i in 1:length(remove)) index <- c(index, grep(tolower(remove[i]), tolower(files)))
       if (length(index) > 0) files <- files[-index]
    }
+
+   # Only keep unique file names:
+   files <- unique(files)
 
    return(files)
 }
 
 #' @export read.esonar
-read.esonar <- function(x, offset = -3*60, ...){
+read.esonar <- function(x, offset = -3*60, repeats = FALSE, ...){
    # Define list of files to be read:
    file <- locate.esonar(x, ...)
 
@@ -134,50 +139,31 @@ read.esonar <- function(x, offset = -3*60, ...){
       return(x)
    }
 
-   # Define string to month function:
-   str2month <- function(x){
-      str <- c("january", "february", "march", "april", "may", "june", "july",
-               "august", "september", "october", "november", "december")
-
-      return(pmatch(tolower(x), str, duplicates.ok = TRUE))
-   }
-
    # Read and parse header info:
    y <- read.table(file = file, nrow = 20, colClasses = "character", sep = "\n", blank.lines.skip = FALSE)
-   str <- gsub(" ", "", strsplit(y[1, ], ",")[[1]])
-   str <- str[str != ""]
-   values <- gsub(" ", "", strsplit(y[2, ], ",")[[1]])
-   #values <- values[values != ""]
-   header <- list()
-   for (i in 1:length(str)){
-      header[[i]] <- values[i]
-   }
-   names(header) <- str
-   str <- gsub(" ", "", strsplit(y[3, ], ",")[[1]])
-   str <- str[str != ""]
-   values <- strsplit(y[4, ], ",")[[1]]
-   values <- values[values != ""]
-   if (is.null(values)) values <- ""
-   for (i in 1:length(str)){
-      header[[length(header)+1]] <- values[i]
-   }
-   names(header) <- c(names(header)[1:(length(header)-1)], str)
-   header$file.name <- file
 
-   fields <- strsplit(y[5,], ",")[[1]] # Split header fields and their values.
-   fields <- gsub(" ", "_", fields)
+   # Define header information:
+   header <- NULL
+   header[gsub(" ", "", strsplit(y[1, ], ",")[[1]])] <- strsplit(y[2, ], ",")[[1]]
+   header[gsub(" ", "", strsplit(y[3, ], ",")[[1]])] <- strsplit(y[4, ], ",")[[1]]
+   header <- header[header != ""]
+   header["file.name"] <- lapply(strsplit(file, "/"), function(x) x[length(x)])[[1]]
+   header["tow.id"] <- toupper(lapply(strsplit(header["file.name"], "[.]"), function(x) x[1])[[1]])
+
+   # Define data field names:
+   fields <- gsub(" ", "_", strsplit(y[5,], ",")[[1]]) # Split header fields and their values.
 
    # Read E-Sonar data:
-   k <- 5
-   x <- read.table(file = file, header = FALSE, skip = k+1, sep = ",", colClasses = "character")
+   x <- read.table(file = file, header = FALSE, skip = 6, sep = ",", colClasses = "character")
    names(x) <- fields
 
+   # Remove lines with no date fields:
    temp <- table(substr(x[, 1], 1, 3))
    x <- x[substr(x[, 1], 1, 3) == names(temp[temp == max(temp)]), ]
 
    # Parse date fields:
    date <- data.frame(year = as.numeric(paste("", substr(x$GPS_Date, 8, 11), sep = "")),
-                      month = str2month(substr(x$GPS_Date, 4, 6)),
+                      month = match(tolower(substr(x$GPS_Date, 4, 6)), substr(tolower(month.name), 1, 3)),
                       day = as.numeric(substr(x$GPS_Date, 1, 2)),
                       stringsAsFactors = FALSE)
 
@@ -227,7 +213,7 @@ read.esonar <- function(x, offset = -3*60, ...){
       v[[tolower(str[i])]][v$sensor == str[i]] <- v$value[v$sensor == str[i]]
    }
 
-   # Set NULL values to zero:
+   # Set NULL values to zero, and zeroes to NA:
    vars <- c("depth", "doormaster", "headline")
    v[setdiff(vars, names(v))] <- NA
    temp <- v[vars]
@@ -235,17 +221,18 @@ read.esonar <- function(x, offset = -3*60, ...){
    v[vars] <- temp
 
    # Remove repeating values:
-   for (i in 1:length(vars)){
-      if (!all(is.na(v[, vars[i]]))){
-         index <- which(diff(v[, vars[i]]) == 0)+1
-         v[index, vars[i]] <- NA
+   if (!repeats){
+      for (i in 1:length(vars)){
+         if (!all(is.na(v[, vars[i]]))){
+            index <- which(diff(v[, vars[i]]) == 0)+1
+            v[index, vars[i]] <- NA
+         }
       }
    }
 
    # Modify time by specified offset:
    if (offset != 0){
       t <- as.character(time(v) + offset * 60)
-
       v$year   <- as.numeric(substr(t, 1, 4))
       v$month  <- as.numeric(substr(t, 6, 7))
       v$day    <- as.numeric(substr(t, 9, 10))
@@ -258,7 +245,7 @@ read.esonar <- function(x, offset = -3*60, ...){
    v <- esonar(v, header)
 
    # Include 'tow.id' as a field:
-   v$tow.id <- info(v)$tow.id
+   v$tow.id <- header[["tow.id"]]
 
    # Remove records with missing time stamp:
    index <- is.na(v$hour) | is.na(v$minute) | is.na(v$second)
@@ -266,3 +253,33 @@ read.esonar <- function(x, offset = -3*60, ...){
 
    return(v)
 }
+
+#' @export
+plot.esonar <- function(x, set.card = NULL){
+   # Define time series in minutes:
+   time <- as.numeric((time(x) - min(time(x))) / 60)
+
+   layout(matrix(1:4, ncol = 2, nrow = 2))
+
+   # Plot primary sensor profile:
+   index <- !is.na(time) & !is.na(x$headline) & (x$headline > 0)
+   plot(time[index], x$headline[index],
+        type = "l", xlab = "Time(min)", ylab = "Headline(m)",
+        col = "blue", ylim = c(0, 50))
+   points(time[index], x$headline[index], pch = 21, bg = "blue")
+
+   # Plot secondary sensor profile:
+   index <- !is.na(time) & !is.na(x$depth)
+   plot(time[index], x$depth[index], type = "l", xlab = "Time(min)", ylab = "Depth(m)", col = "blue")
+   points(time[index], x$depth[index], pch = 21, bg = "blue")
+
+   # Plot door spread profile:
+   index <- !is.na(time) & !is.na(x$doormaster) & (x$doormaster > 0)
+   plot(time[index], x$doormaster[index], type = "l",
+        xlab = "Time(min)", ylab = "Door spread(m)",
+        ylim = c(0, 30), col = "blue")
+   points(time[index], x$doormaster[index], pch = 21, bg = "blue")
+
+   map(x)
+}
+
