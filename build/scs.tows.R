@@ -1,9 +1,9 @@
 library(gulf)
 
 # Load raw data export:
-x <- read.table("U:/Snow Crab/Stock Assessment 2020/data/raw/Tow Data.txt", sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+x <- read.table("data/raw/Tow Data.txt", sep = "\t", header = TRUE, stringsAsFactors = FALSE)
 names(x) <- gsub("_", ".", tolower(names(x)))
-           
+
 # Rename fields:
 x$tow.id <- toupper(x$gpnumber)
 
@@ -21,7 +21,7 @@ x$speed.comment <- gsub("[ ]*$", "", x$speed.comment)
 x$comment[!index] <- paste0(x$comment[!index], " - ", x$speed.comment[!index])
 x$comment <- gsub("(É)|(Ã‰)", "E", x$comment)
 x$comment <- paste0(substr(x$comment, 1, 1), substr(tolower(x$comment), 2, nchar(x$comment)))
-           
+
 # Parse date fields:
 x$day   <- as.numeric(unlist(lapply(strsplit(x$date, ".", fixed = TRUE), function(x) x[1])))
 x$month <- as.numeric(unlist(lapply(strsplit(x$date, ".", fixed = TRUE), function(x) x[2])))
@@ -29,7 +29,7 @@ x$year  <- as.numeric(unlist(lapply(strsplit(x$date, ".", fixed = TRUE), functio
 
 # Zone and tow ID fields:
 x$zone <- gsub("ZONE", "", toupper(x$zone))
-  
+
 # Fix time fields:
 x$gpa.time.start <- gsub("?", "", x$gpa.time.start, fixed = TRUE)
 x$gpa.time.start[x$gpa.time.start == ""] <- "        "
@@ -48,9 +48,9 @@ x$end.time.logbook[nchar(x$end.time.logbook) > 8]     <- "        "
 
 # Coordinate conversion:
 x$longitude.start.logbook <- -dmm2deg(x$gpa.lon.start)
-x$longitude.end.logbook   <- -dmm2deg(x$gpa.lon.end) 
-x$latitude.start.logbook  <- dmm2deg(x$gpa.lat.start) 
-x$latitude.end.logbook    <- dmm2deg(x$gpa.lat.end) 
+x$longitude.end.logbook   <- -dmm2deg(x$gpa.lon.end)
+x$latitude.start.logbook  <- dmm2deg(x$gpa.lat.start)
+x$latitude.end.logbook    <- dmm2deg(x$gpa.lat.end)
 
 # Tow validity:
 x$valid <- as.numeric(tolower(x$tow.quality) == "good")
@@ -69,12 +69,12 @@ x$tow.number <- x$trawl.number
 x$warp <- x$cables
 
 # Remove irrelevant variables:
-vars <- c("year", "month", "day", "zone", "tow.number", "tow.id", 
+vars <- c("year", "month", "day", "zone", "tow.number", "tow.id",
           "start.time.logbook", "end.time.logbook", "start.time", "end.time", "valid",
-          "longitude", "latitude", "longitude.start.logbook", "longitude.end.logbook", 
+          "longitude", "latitude", "longitude.start.logbook", "longitude.end.logbook",
           "latitude.start.logbook", "latitude.end.logbook",
           "depth", "bottom.temperature", "warp", "swept.area", "swept.area.method", "groundfish.sample", "water.sample", "comment")
-x <- x[vars]    
+x <- x[vars]
 
 
 write.csv(x, file = "U:/Snow Crab/Stock Assessment 2020/data/scs.set.2020.csv", row.names = FALSE)
@@ -83,4 +83,3 @@ class(x) <- c("scset", "gulf.set", "ascii", "data.frame")
 attr(x, "converted") <- TRUE
 
 write(x, file = "W:/Crab/Offshore Crab Common/Fishing Year 2020/Trawl Data/South Western Gulf/Tow Data/Tows 2020.txt")
-       
