@@ -1,7 +1,7 @@
-library(gulf)
+library(gulf.data)
 
 # Load raw data export:
-x <- read.table("data/raw/Tow Data.txt", sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+x <- read.table("data/raw/scs.set.2020.csv", header = TRUE, sep =",", stringsAsFactors = FALSE, fileEncoding = "Windows-1252")
 names(x) <- gsub("_", ".", tolower(names(x)))
 
 # Rename fields:
@@ -19,7 +19,6 @@ index <- x$comment == ""
 x$comment[index] <- x$speed.comment[index]
 x$speed.comment <- gsub("[ ]*$", "", x$speed.comment)
 x$comment[!index] <- paste0(x$comment[!index], " - ", x$speed.comment[!index])
-x$comment <- gsub("(É)|(Ã‰)", "E", x$comment)
 x$comment <- paste0(substr(x$comment, 1, 1), substr(tolower(x$comment), 2, nchar(x$comment)))
 
 # Parse date fields:
@@ -47,10 +46,15 @@ x$mid.time.logbook[nchar(x$mid.time.logbook) > 8]     <- "        "
 x$end.time.logbook[nchar(x$end.time.logbook) > 8]     <- "        "
 
 # Coordinate conversion:
-x$longitude.start.logbook <- -dmm2deg(x$gpa.lon.start)
-x$longitude.end.logbook   <- -dmm2deg(x$gpa.lon.end)
-x$latitude.start.logbook  <- dmm2deg(x$gpa.lat.start)
-x$latitude.end.logbook    <- dmm2deg(x$gpa.lat.end)
+#x$longitude.start.logbook <- -dmm2deg(x$gpa.lon.start)
+#x$longitude.end.logbook   <- -dmm2deg(x$gpa.lon.end)
+#x$latitude.start.logbook  <- dmm2deg(x$gpa.lat.start)
+#x$latitude.end.logbook    <- dmm2deg(x$gpa.lat.end)
+
+x$longitude.start.logbook <- -abs(x$gpa.lon.start)
+x$longitude.end.logbook   <- -abs(x$gpa.lon.end)
+x$latitude.start.logbook  <- x$gpa.lat.start
+x$latitude.end.logbook    <- x$gpa.lat.end
 
 # Tow validity:
 x$valid <- as.numeric(tolower(x$tow.quality) == "good")
@@ -76,10 +80,7 @@ vars <- c("year", "month", "day", "zone", "tow.number", "tow.id",
           "depth", "bottom.temperature", "warp", "swept.area", "swept.area.method", "groundfish.sample", "water.sample", "comment")
 x <- x[vars]
 
-
-write.csv(x, file = "U:/Snow Crab/Stock Assessment 2020/data/scs.set.2020.csv", row.names = FALSE)
-
-class(x) <- c("scset", "gulf.set", "ascii", "data.frame")
-attr(x, "converted") <- TRUE
-
-write(x, file = "W:/Crab/Offshore Crab Common/Fishing Year 2020/Trawl Data/South Western Gulf/Tow Data/Tows 2020.txt")
+write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
+if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
+   write.csv(x, file = "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv", row.names = FALSE)
+}
