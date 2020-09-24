@@ -44,6 +44,7 @@ x$end.time.logbook   <- x$gpa.time.end
 x$start.time.logbook[nchar(x$start.time.logbook) > 8] <- "        "
 x$mid.time.logbook[nchar(x$mid.time.logbook) > 8]     <- "        "
 x$end.time.logbook[nchar(x$end.time.logbook) > 8]     <- "        "
+x$haul.time <- x$net.end
 
 # Coordinate conversion:
 #x$longitude.start.logbook <- -dmm2deg(x$gpa.lon.start)
@@ -72,11 +73,13 @@ x$latitude          <- as.numeric(NA)
 x$tow.number <- x$trawl.number
 x$warp <- x$cables
 
+x <- x[setdiff(names(x), "date")]
+x$date <- as.character(date(year = x$year, month = x$month, day = x$day))
+
 # Remove irrelevant variables:
-vars <- c("year", "month", "day", "zone", "tow.number", "tow.id",
-          "start.time.logbook", "end.time.logbook", "start.time", "end.time", "valid",
-          "longitude", "latitude", "longitude.start.logbook", "longitude.end.logbook",
-          "latitude.start.logbook", "latitude.end.logbook",
+vars <- c("date", "zone", "tow.number", "tow.id", "valid",
+          "start.time.logbook", "end.time.logbook", "start.time", "end.time", "haul.time",
+          "longitude", "latitude", "longitude.start.logbook", "longitude.end.logbook", "latitude.start.logbook", "latitude.end.logbook",
           "depth", "bottom.temperature", "warp", "swept.area", "swept.area.method", "groundfish.sample", "water.sample", "comment")
 x <- x[vars]
 
