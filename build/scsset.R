@@ -83,6 +83,8 @@ vars <- c("date", "zone", "tow.number", "tow.id", "valid",
           "depth", "bottom.temperature", "warp", "swept.area", "swept.area.method", "groundfish.sample", "water.sample", "comment")
 x <- x[vars]
 
+x <- x[x$date != "2020-07-10", ]
+
 write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
 if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
    write.csv(x, file = "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv", row.names = FALSE)
