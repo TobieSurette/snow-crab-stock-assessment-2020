@@ -3,7 +3,6 @@ AVALON VOYAGER,1,3
 Comments
 "ZONE12E"
 CPU Date and Time,GPS Date,GPS Time,Latitude,Longitude,Speed,Heading,Validity,Transducer Name,Sensor Name,Sensor Value,Error Code,Hydrophone,Signal Strength
-,19-Jul-2020,113050,48 36.886500 N,062 57.736900 W,2.9,136.5,A,,,,,,
 Sun Jul 19 08:30:50 2020,19-Jul-2020,113051,48 36.885800 N,062 57.736100 W,2.9,136.6,A,DoorSpread,DoorMaster,1.370000,D,S,144004.000000
 Sun Jul 19 08:30:50 2020,19-Jul-2020,113052,48 36.885100 N,062 57.735200 W,2.9,136.7,A,DoorSpread,DoorMaster,1.370000,D,S,144004.000000
 Sun Jul 19 08:30:53 2020,19-Jul-2020,113053,48 36.884500 N,062 57.734300 W,2.9,136.8,A,Primary,Headline,3.224490,D,S,10962.000000

@@ -1,7 +1,7 @@
 Ship Number,Trip Number,Tow Number
 AVALON VOYAGER,3,1
 Comments
-""
+"Zone"
 CPU Date and Time,GPS Date,GPS Time,Latitude,Longitude,Speed,Heading,Validity,Transducer Name,Sensor Name,Sensor Value,Error Code,Hydrophone,Signal Strength
 Fri Aug 14 06:49:16 2020,14-Aug-2020,084916,47 54.269200 N,061 44.689200 W,2.0,154.9,A,DoorSpread,DoorMaster,2.035000,D,P,207961.000000
 Fri Aug 14 06:49:16 2020,14-Aug-2020,084917,47 54.268800 N,061 44.688800 W,1.9,154.3,A,DoorSpread,DoorMaster,2.035000,D,P,207961.000000
