@@ -40,10 +40,10 @@ x$gpa.time.end[x$gpa.time.end == ""] <- "        "
 # Observed time fields:
 x$start.time.logbook <- x$gpa.time.start
 x$mid.time.logbook   <- x$gpa.time.mid
-x$end.time.logbook   <- x$gpa.time.end
+x$stop.time.logbook   <- x$gpa.time.end
 x$start.time.logbook[nchar(x$start.time.logbook) > 8] <- "        "
 x$mid.time.logbook[nchar(x$mid.time.logbook) > 8]     <- "        "
-x$end.time.logbook[nchar(x$end.time.logbook) > 8]     <- "        "
+x$stop.time.logbook[nchar(x$stop.time.logbook) > 8]     <- "        "
 x$haul.time <- x$net.end
 
 # Coordinate conversion:
@@ -62,7 +62,7 @@ x$valid <- as.numeric(tolower(x$tow.quality) == "good")
 
 # Add variables to be filled-in later:
 x$start.time        <- "        "
-x$end.time          <- "        "
+x$stop.time          <- "        "
 x$swept.area        <- as.numeric(NA)
 x$swept.area.method <- as.numeric(NA)
 x$groundfish.sample	<- 0
@@ -78,12 +78,15 @@ x$date <- as.character(date(year = x$year, month = x$month, day = x$day))
 
 # Remove irrelevant variables:
 vars <- c("date", "zone", "tow.number", "tow.id", "valid",
-          "start.time.logbook", "end.time.logbook", "start.time", "end.time", "haul.time",
+          "start.time.logbook", "stop.time.logbook", "start.time", "stop.time", "haul.time",
           "longitude", "latitude", "longitude.start.logbook", "longitude.end.logbook", "latitude.start.logbook", "latitude.end.logbook",
           "depth", "bottom.temperature", "warp", "swept.area", "swept.area.method", "groundfish.sample", "water.sample", "comment")
 x <- x[vars]
 
+# Corrections:
 x <- x[x$date != "2020-07-10", ]
+x$stop.time.logbook[x$tow.id == "GP263F"] <- "10:30:55"
+x$stop.time.logbook[x$tow.id == "GP159F"] <- "12:55:47"
 
 write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
 if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
