@@ -3,18 +3,6 @@ AVALON VOYAGER,4,12
 Comments
 "ZONE12"
 CPU Date and Time,GPS Date,GPS Time,Latitude,Longitude,Speed,Heading,Validity,Transducer Name,Sensor Name,Sensor Value,Error Code,Hydrophone,Signal Strength
-,24-Aug-2020,212517,46 16.129200 N,061 48.586500 W,8.2,281.6,A,,,,,,
-,24-Aug-2020,212518,46 16.129700 N,061 48.589900 W,8.2,281.5,A,,,,,,
-,24-Aug-2020,212519,46 16.130300 N,061 48.593200 W,8.2,281.9,A,,,,,,
-Ship Number,Trip Number,Tow Number
-AVALON VOYAGER,4,12
-Comments
-"ZONE12"
-CPU Date and Time,GPS Date,GPS Time,Latitude,Longitude,Speed,Heading,Validity,Transducer Name,Sensor Name,Sensor Value,Error Code,Hydrophone,Signal Strength
-,24-Aug-2020,214444,46 16.350700 N,061 51.601800 W,2.1,192.4,A,,,,,,
-,24-Aug-2020,214445,46 16.350100 N,061 51.602100 W,2.1,192.6,A,,,,,,
-,24-Aug-2020,214446,46 16.349600 N,061 51.602300 W,2.1,192.7,A,,,,,,
-,24-Aug-2020,214447,46 16.349000 N,061 51.602700 W,2.1,192.8,A,,,,,,
 Mon Aug 24 19:44:47 2020,24-Aug-2020,214448,46 16.348500 N,061 51.603000 W,2.0,192.7,A,DoorSpread,DoorMaster,2.110000,D,S,812307.000000
 Mon Aug 24 19:44:47 2020,24-Aug-2020,214449,46 16.348000 N,061 51.603400 W,2.0,192.7,A,DoorSpread,DoorMaster,2.110000,D,S,812307.000000
 Mon Aug 24 19:44:47 2020,24-Aug-2020,214450,46 16.347500 N,061 51.603700 W,2.0,192.7,A,DoorSpread,DoorMaster,2.110000,D,S,812307.000000
