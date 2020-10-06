@@ -88,7 +88,31 @@ x <- x[x$date != "2020-07-10", ]
 x$stop.time.logbook[x$tow.id == "GP263F"] <- "10:30:55"
 x$stop.time.logbook[x$tow.id == "GP159F"] <- "12:55:47"
 
+# Load touchdown times:
+if (file.exists("data/raw/scs.touchdown.time.2020.csv")){
+   tmp <- read.csv("data/raw/scs.touchdown.time.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+   x$touchdown.time <- tmp$touchdown[match(x$tow.id, tmp$tow.id)]
+   x$touchdown.time[is.na(x$touchdown.time)] <- "        "
+}
+
+# Load liftoff times:
+if (file.exists("data/raw/scs.liftoff.time.2020.csv")){
+   tmp <- read.csv("data/raw/scs.liftoff.time.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+   x$liftoff.time <- tmp$liftoff[match(x$tow.id, tmp$tow.id)]
+   x$liftoff.time[is.na(x$liftoff.time)] <- "        "
+}
+
+tvars <- names(x)[grep("time", names(x))]
+
+vars <- c("date", "zone", "tow.number", "tow.id", "valid", tvars, setdiff(vars, c("date", "zone", "tow.number", "tow.id", "valid", tvars)))
+x <- x[vars]
+
 write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
 if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
    write.csv(x, file = "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv", row.names = FALSE)
 }
+
+if (file.exists("W:/Crab/SuretteTJ/Desktop/gulf.data")){
+   write.csv(x, file = "W:/Crab/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv", row.names = FALSE)
+}
+
