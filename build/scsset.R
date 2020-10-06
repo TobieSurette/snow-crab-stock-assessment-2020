@@ -107,12 +107,20 @@ tvars <- names(x)[grep("time", names(x))]
 vars <- c("date", "zone", "tow.number", "tow.id", "valid", tvars, setdiff(vars, c("date", "zone", "tow.number", "tow.id", "valid", tvars)))
 x <- x[vars]
 
+# Write to stock assessment repository:
 write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
+
+# Write to gulf.data repository:
 if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
-   write.csv(x, file = "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv", row.names = FALSE)
+   file <- "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv"
+   write.csv(x, file = file, row.names = FALSE)
 }
 
-if (file.exists("W:/Crab/SuretteTJ/Desktop/gulf.data")){
-   write.csv(x, file = "W:/Crab/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv", row.names = FALSE)
+# Write to W: drive:
+if (file.exists(options("gulf.path")$gulf.path$snow.crab)){
+   file <- paste0(options("gulf.path")$gulf.path$snow.crab,
+                  "/Offshore Crab Common/Fishing Year 2020/Trawl Data/South Western Gulf/",
+                  "scs.set.2020.csv")
+   write.csv(x, file = file, row.names = FALSE)
 }
 
