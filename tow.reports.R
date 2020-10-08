@@ -17,6 +17,6 @@ clg(); plot(x, wingspread = FALSE, headline = FALSE, tilt = FALSE)
 read.esonar(x[which(x$tow.id == "GP276F"), ])
 
 clg()
-x <- read.scsset(2020, tow.id = "GP276F")
-plot(x)
+x <- read.scsset(2020, tow.id = "GP002F")
+plot(x, pdf = TRUE, path = paste0(getwd(), "/results/tow reports"))
 
