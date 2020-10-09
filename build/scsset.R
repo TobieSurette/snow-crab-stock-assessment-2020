@@ -93,6 +93,8 @@ if (file.exists("data/raw/scs.touchdown.time.2020.csv")){
    tmp <- read.csv("data/raw/scs.touchdown.time.2020.csv", header = TRUE, stringsAsFactors = FALSE)
    x$touchdown.time <- tmp$touchdown[match(x$tow.id, tmp$tow.id)]
    x$touchdown.time[is.na(x$touchdown.time)] <- "        "
+   index <- nchar(x$touchdown.time) == 7
+   x$touchdown.time[index] <- paste0("0", x$touchdown.time[index])
 }
 
 # Load liftoff times:
@@ -100,6 +102,8 @@ if (file.exists("data/raw/scs.liftoff.time.2020.csv")){
    tmp <- read.csv("data/raw/scs.liftoff.time.2020.csv", header = TRUE, stringsAsFactors = FALSE)
    x$liftoff.time <- tmp$liftoff[match(x$tow.id, tmp$tow.id)]
    x$liftoff.time[is.na(x$liftoff.time)] <- "        "
+   index <- nchar(x$liftoff.time) == 7
+   x$liftoff.time[index] <- paste0("0", x$liftoff.time[index])
 }
 
 tvars <- names(x)[grep("time", names(x))]
