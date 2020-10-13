@@ -79,11 +79,6 @@ s$liftoff.time <- unlist(lapply(strsplit(str, " "), function(x) x[2]))
 str <- as.character(start.time(s) + 60* res$touchdown[index])
 s$touchdown.time <- unlist(lapply(strsplit(str, " "), function(x) x[2]))
 
-
 # Write to file:
 write.csv(s[c("date", "tow.id", "touchdown.time")], file = "scs.touchdown.time.2020.csv", row.names = FALSE)
 write.csv(s[c("date", "tow.id", "liftoff.time")], file = "scs.liftoff.time.2020.csv", row.names = FALSE)
-
-
-head(s)
-

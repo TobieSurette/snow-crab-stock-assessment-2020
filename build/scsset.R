@@ -1,4 +1,5 @@
 library(gulf.data)
+library(gulf.spatial)
 
 # Load raw data export:
 x <- read.table("data/raw/scs.set.2020.csv", header = TRUE, sep =",", stringsAsFactors = FALSE, fileEncoding = "Windows-1252")
@@ -53,9 +54,9 @@ x$haul.time <- x$net.end
 #x$latitude.end.logbook    <- dmm2deg(x$gpa.lat.end)
 
 x$longitude.start.logbook <- -abs(x$gpa.lon.start)
-x$longitude.end.logbook   <- -abs(x$gpa.lon.end)
+x$longitude.stop.logbook  <- -abs(x$gpa.lon.end)
 x$latitude.start.logbook  <- x$gpa.lat.start
-x$latitude.end.logbook    <- x$gpa.lat.end
+x$latitude.stop.logbook   <- x$gpa.lat.end
 
 # Tow validity:
 x$valid <- as.numeric(tolower(x$tow.quality) == "good")
@@ -69,6 +70,10 @@ x$groundfish.sample	<- 0
 x$water.sample      <- as.numeric(NA)
 x$longitude         <- as.numeric(NA)
 x$latitude          <- as.numeric(NA)
+x$longitude.start   <- as.numeric(NA)
+x$longitude.stop    <- as.numeric(NA)
+x$latitude.start    <- as.numeric(NA)
+x$latitude.stop     <- as.numeric(NA)
 
 x$tow.number <- x$trawl.number
 x$warp <- x$cables
@@ -79,7 +84,8 @@ x$date <- as.character(date(year = x$year, month = x$month, day = x$day))
 # Remove irrelevant variables:
 vars <- c("date", "zone", "tow.number", "tow.id", "valid",
           "start.time.logbook", "stop.time.logbook", "start.time", "stop.time", "haul.time",
-          "longitude", "latitude", "longitude.start.logbook", "longitude.end.logbook", "latitude.start.logbook", "latitude.end.logbook",
+          "longitude", "latitude", "longitude.start", "longitude.stop", "latitude.start", "latitude.stop",
+          "longitude.start.logbook", "longitude.stop.logbook", "latitude.start.logbook", "latitude.stop.logbook",
           "depth", "bottom.temperature", "warp", "swept.area", "swept.area.method", "groundfish.sample", "water.sample", "comment")
 x <- x[vars]
 
@@ -106,8 +112,35 @@ if (file.exists("data/raw/scs.liftoff.time.2020.csv")){
    x$liftoff.time[index] <- paste0("0", x$liftoff.time[index])
 }
 
-tvars <- names(x)[grep("time", names(x))]
+# Load trawl swept area and swept area method:
+if (file.exists("data/raw/scs.swept.area.2020.csv")){
+   tmp <- read.csv("data/raw/scs.swept.area.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+   x$swept.area <- tmp$swept.area[match(x$tow.id, tmp$tow.id)]
+   x$swept.area.method <- tmp$swept.area.method[match(x$tow.id, tmp$tow.id)]
+   x$swept.area.method[is.na(x$swept.area.method)] <- ""
+}
 
+x <- scsset(x)
+
+# Look-up touchdown and stop time coordinates in eSonar file:
+tows <- setdiff(x$tow.id[x$valid == 1], "GP276F")
+for (j in 1:length(tows)){
+   i <- which(x$tow.id == tows[j])
+   print(i)
+   e <- read.esonar(x[i,])
+   d <- abs(time(e) - time(x[i, ], "touchdown"))
+   if (min(d) <= 5){
+      x$longitude.start[i] <- gulf.spatial::deg2dmm(e$longitude[which.min(d)])
+      x$latitude.start[i] <- gulf.spatial::deg2dmm(e$latitude[which.min(d)])
+   }
+   d <- abs(time(e) - time(x[i, ], "stop"))
+   if (min(d) <= 5){
+      x$longitude.stop[i] <- gulf.spatial::deg2dmm(e$longitude[which.min(d)])
+      x$latitude.stop[i] <- gulf.spatial::deg2dmm(e$latitude[which.min(d)])
+   }
+}
+
+tvars <- names(x)[grep("time", names(x))]
 vars <- c("date", "zone", "tow.number", "tow.id", "valid", tvars, setdiff(vars, c("date", "zone", "tow.number", "tow.id", "valid", tvars)))
 x <- x[vars]
 
@@ -115,8 +148,8 @@ x <- x[vars]
 write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
 
 # Write to gulf.data repository:
-if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
-   file <- "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.set.2020.csv"
+if (file.exists("/Users/crustacean/Desktop/gulf.data")){
+   file <- "/Users/crustacean/Desktop/gulf.data/inst/extdata/scs.set.2020.csv"
    write.csv(x, file = file, row.names = FALSE)
 }
 
