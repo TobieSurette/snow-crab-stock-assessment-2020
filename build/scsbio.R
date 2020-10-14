@@ -67,12 +67,21 @@ vars <- c("date", "time", "tow.id", "tow.number", "crab.number", "sex",
           "gonad.colour", "egg.colour", "eggs.remaining", "samplers", "tag.number", "trap.code", "comment")
 x <- x[vars]
 
+# Date fix:
+x$date[(x$date == "2020-07-12") & (x$tow.id == "GP354F")] <- "2020-07-13"
+
 write.csv(x, file = "data/scs.bio.2020.csv", row.names = FALSE)
 
 # Update gulf.data repo:
 if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
    write.csv(x, file = "C:/Users/SuretteTJ/Desktop/gulf.data/inst/extdata/scs.bio.2020.csv", row.names = FALSE)
 }
+
+# Update gulf.data repo:
+if (file.exists("/Users/crustacean/Desktop/gulf.data")){
+   write.csv(x, file = "/Users/crustacean/Desktop/gulf.data/inst/extdata/scs.bio.2020.csv", row.names = FALSE)
+}
+
 
 # x <- write.csv("data/scs.bio.2020.csv", header = TRUE, row.names = FALSE)
 
