@@ -1,4 +1,4 @@
-library(gulf)
+library(gulf.data)
 library(gulf.spatial)
 
 # Load survey data:
@@ -15,15 +15,12 @@ s <- s[survey(s) == survey, ]
 # Load biological data:
 b <- read.scsbio(year = year, valid = 1)
 
-
 for (i in 1:length(category)){
    ss <- s
    bb <- b[is.category(b, category = category[i]), ]
    import(ss, fill = 0) <- freq(bb, by = key(s))
 
-   print(years[i])
-   index <- which(b$sex == sex & b$year == years[i])
-   vars <- c("year", "tow.id", "grid")
+   vars <- c("date", "tow.id")
    f <- freq(b[index, ], category = cvars, by = vars)
    f <- f[!is.na(f$year), ]
    fvars <- setdiff(names(f), c(vars, "category"))
