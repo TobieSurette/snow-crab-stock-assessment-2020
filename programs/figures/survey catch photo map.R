@@ -14,7 +14,7 @@ files <- locate(keywords = "photo", file = "^GP")
 x <- read.scsset(year = year, valid = 1)
 
 # Fix fishing zones:
-#z <- fishing.zone(longitude(x), latitude(x), species = 2526)
+#z <- fishing.zone(lon(x), lat(x), species = 2526)
 #x$zone[which(z != x$zone)] <- z[which(z != x$zone)]
 #x$zone[is.na(z)] <- "buffer"
 

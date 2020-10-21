@@ -122,7 +122,7 @@ if (file.exists("data/raw/scs.swept.area.2020.csv")){
 
 x <- scsset(x)
 
-# Look-up touchdown and stop time coordinates in eSonar file:
+# Update touchdown and stop time coordinates using eSonar files:
 tows <- setdiff(x$tow.id[x$valid == 1], "GP276F")
 for (j in 1:length(tows)){
    i <- which(x$tow.id == tows[j])
@@ -140,6 +140,21 @@ for (j in 1:length(tows)){
    }
 }
 
+# Update bottom temperatures using headline Star Oddi files:
+for (j in 1:length(tows)){
+   i <- which(x$tow.id == tows[j])
+   s <- read.star.oddi(x[i,], probe = "headline")
+   if (!is.null(s)){
+      t <- time2min(time(s), time(x[i, ], "touchdown"))
+      liftoff <- time2min(time(x[i, ], "liftoff"), time(x[i, ], "touchdown"))
+      index <- which((t >= 3) & (t <= liftoff))
+      tmp <- round(mean(s$temperature[index], na.rm = TRUE), 2)
+      if (!is.na(tmp)) x$bottom.temperature[i] <- tmp
+      print(c(i, tmp))
+   }
+}
+
+# Re-order variables:
 tvars <- names(x)[grep("time", names(x))]
 vars <- c("date", "zone", "tow.number", "tow.id", "valid", tvars, setdiff(vars, c("date", "zone", "tow.number", "tow.id", "valid", tvars)))
 x <- x[vars]
