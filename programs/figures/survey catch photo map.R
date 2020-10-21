@@ -19,7 +19,7 @@ x <- read.scsset(year = year, valid = 1)
 #x$zone[is.na(z)] <- "buffer"
 
 # Define image width in degrees:
-thin <- 8 # Image thinning factor (large numbers = more thinning, 1 = no thinning)
+thin <- 2 # Image thinning factor (large numbers = more thinning, 1 = no thinning)
 
 # Load survey grid file:
 mif <- read.gulf.spatial("grids", survey = "scs")
@@ -61,16 +61,16 @@ for (i in 1:length(mif)){
          # Load photo:
          p <- readJPEG(file, native = FALSE)
 
-         # Thin-out image:
+         # Reshape iPad photos:
          if (prod(dim(p)[1:2]) < 10000000){
-            # Photos taken via iPad:
             p <- p[seq(1, nrow(p), by = 5), seq(1, ncol(p), by = 5), ]
             tmp <- array(NA, dim = c(dim(p)[2], dim(p)[1], dim(p)[3]))
             for (k in 1:3) tmp[,,k] <- t(p[,,k])
             p <- tmp
-         }else{
-            p <- p[seq(1, nrow(p), by = thin), seq(1, ncol(p), by = thin), ]
          }
+
+         # Thin-out image:
+         p <- p[seq(1, nrow(p), by = thin), seq(1, ncol(p), by = thin), ]
 
          # Crop image border:
          p <- p[round(crop * dim(p)[1]):round((1-crop) * dim(p)[1]), round(crop * dim(p)[2]):round((1-crop) * dim(p)[2]), ]
