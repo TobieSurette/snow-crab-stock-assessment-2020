@@ -19,7 +19,7 @@ s$julian <- round(julian(date(s)))
 s$time <- as.numeric(time(s, "touchdown") - date(s))
 
 clg()
-if (!jpeg) dev.new() else jpeg(filename = paste0("results/figures/dawn and dusk ", year, " - ", language, ".jpeg"), width = 7*480, height = 7*480, res = 7*75)
+if (!jpeg) dev.new() else jpeg(filename = paste0("results/figures/dawn and dusk ", year, " - ", language, ".jpg"), width = 7*480, height = 7*480, res = 7*75)
 
 xlim <- c(date("2020/07/10"), date(year = 2020, month = 9, day = 20))
 xlim <- round(time2day(xlim, date("2020/01/01")))
