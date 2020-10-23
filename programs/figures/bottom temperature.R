@@ -2,9 +2,9 @@ library(gulf.data)
 library(gulf.spatial)
 library(mgcv)
 
-years <- 2020
+year <- 2020
 language <- "french"
-jpeg <- TRUE
+output <- "pdf"
 tables <- TRUE
 var.str <- ifelse(language == "french", "température", "temperature")
 language.str <- ifelse(language == "french", "français", "english")
@@ -21,13 +21,15 @@ if (language == "english"){
 s <- read.scsset(year = year, valid = 1)
 s <- s[survey(s) == "regular", ]
 
-if (jpeg){
+if (output != ""){
    if (language == "english") file.name <- paste0("bottom temperature depth profile ", year)
    if (language == "french")  file.name <- paste0("température versus profondeur ", year)
    path <- paste0("results/figures", path.name)
    if (!file.exists(path)) dir.create(path)
-   jpeg(filename = paste0(path, "/", file.name, ".jpg") , width = 600 * 8.5, height = 600 * 8.5, res = 75 * 8)
-}else{
+}
+if (output == "jpeg") jpeg(file = paste0(path, "/", file.name, ".jpg") , width = 600 * 8.5, height = 600 * 8.5, res = 75 * 8)
+if (output == "pdf")  pdf(file = paste0(path, "/", file.name, ".pdf") , width = 8.5, height = 8.5)
+if (output == ""){
    clg()
    dev.new(width = 8.5, height = 8.5)
 }
@@ -58,24 +60,31 @@ for (i in 1:nrow(res)){
 }
 points(res$depth, res$mean, pch = 21, bg = "red", cex = 1.25)
 box()
-if (jpeg) dev.off()
+if (output != "") dev.off()
 
 # Temperature map:
-if (jpeg){
+if (output != ""){
    if (language == "english") file.name <- paste0("bottom temperature map ", year)
    if (language == "french")  file.name <- paste0("carte de température du fond ", year)
    path <- paste0("results/figures", path.name)
-   if (file.exists(path)) dir.create(path)
-   jpeg(filename = paste0(path, file.name, ".jpg"), width = 600 * 8.5, height = 600 * 8.5, res = 75 * 8)
-}else{
+   if (!file.exists(path)) dir.create(path)
+}
+if (output == "jpeg") jpeg(file = paste0(path, "/", file.name, ".jpg"), width = 600 * 8.5, height = 600 * 8.5, res = 75 * 8)
+if (output == "pdf")  pdf(file = paste0(path, "/", file.name, ".pdf"), width = 8.5, height = 8.5)
+if (output == ""){
    clg()
    dev.new(width = 8.5, height = 8.5)
 }
 
-clg()
-map()
-bathymetry()
-coast()
+map.new()
+#map("bathymetry")
+map("coast")
+
+zones <- c("12", "12E", "12F")
+p <- read.gulf.spatial("fishing zone vertices", file = "shp", species = 2526, region = "gulf", zone = zones)
+plot(p, add = TRUE)
+
+
 
 #map.fishing.zones(species = 2526, lwd = 2)
 index <- y > 0
@@ -94,4 +103,4 @@ legend("bottomleft",
 
 box()
 
-if (jpeg) dev.off()
+if (output != "") dev.off()
