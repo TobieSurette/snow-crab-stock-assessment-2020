@@ -1,60 +1,59 @@
-library(gulf)
+library(gulf.data)
+library(gulf.stats)
+library(gulf.graphics)
+library(gulf.spatial)
 
-source("C:/gulf package/gulf/R/summary.scset.R")
-source("C:/gulf package/gulf/R/ked.scset.R")
+# Survey year:
+year <- 2020
+if (language == "french") language <- "franÃ§ais"
+output <- paste0("results/tables/", language, "/")
 
-load("C:/gulf package/gulf/data/kriging.polygons.revised.rda")
-p <- kriging.polygons
-poly.str <- c("gulf", "zone12", "zone19", "zoneE", "zoneF", "zoneEF_unassigned", "zone19_F_buffer", "zone19_12_buffer", "static_closure_2018", "static_closure_inside_2018")
-p <- p[poly.str]
+# Load kriging polygons:
+p <- read.gulf.spatial("kriging polygons revised")["gulf"]
 
-vars <- category.str(sex = 1)
 vars <- c("COMLT102SC3", "COMLT102SC5", "COMLT102SC4", "COMLT102SC1", "COMLT102ML", "TMMGE102SC5", "TMMGE95SC5")     # Problem categories
 vars <- c("MMGE95SC12", "MMGE95SC3", "MMGE95SC4", "MMGE95SC5")
 vars <- "MIGE34L45"  # Instar VIII recruitment.
 vars <- c("MM", "MMGE95", "MML95") # Adult males.
 vars <- c("FI", "FIGNO", "FM", "FP", "FMULT") # Females.
-vars <- c("MIGE56L69", "MIGE69L83", "MIGE83", "MIGE83L98", "MMGE95SC12") # R-4, R-3, R-2 male recruitment. 
-vars <- c( "MMGE95SC12") # Elmer's R-2 and R-1 male recruitment. 
+vars <- c("MIGE56L69", "MIGE69L83", "MIGE83", "MIGE83L98", "MMGE95SC12") # R-4, R-3, R-2 male recruitment.
+vars <- c( "MMGE95SC12") # Elmer's R-2 and R-1 male recruitment.
 vars <- c( "MIGE83L98SC345") # Skip-moulters.
 
-vars <- c("MMGE95SC12", "MMGE95SC3", "MMGE95SC4", "MMGE95SC5", "MIGE34L45", "MM", "MMGE95", "MML95", 
+vars <- c("MMGE95SC12", "MMGE95SC3", "MMGE95SC4", "MMGE95SC5", "MIGE34L45", "MM", "MMGE95", "MML95",
           "FM", "FIGNO", "FP", "FMULT", "MIGE56L69", "MIGE69L83", "MIGE83", "MIGE83L98", "MMGE95SC12", "MIGE83L98SC345")
 vars <- unique(vars)
-          
+categories <- category(sex = 1)
 
-x <- read.scset(year = 2019, valid = 1)
-x <- x[substr(x$tow.id, 2, 2) != "C", ]
-x <- summary(x, category = "FM")
-v <- gulf::variogram(x, variable = "FM", lag = 3, max.distance = 75, fit = TRUE, inits = list(range = 20))
-plot(v)
+# Read three years of data (for variogram averaging):
+s <- read.scsset(year = (year-2):year, survey = "regular", valid = 1) # Tow data.
+b <- read.scsbio(year = (year-2):year, survey = "regular")            # Biological data.
+
+# Import catch data:
+import(s, fill = 0) <- catch(b, category = categories) # Merge catches.
+s[categories] <- 1000000 * s[categories] / repvec(s$swept.area, ncol = length(categories))   # Convert to # per km2.
 
 # Uncorrected variables:
 res <- list()
-years <- 2019
-for (i in 1:length(years)){
-   # Perform kriging with external drift using three-year variogram averaging:
-   #m <- ked.scset(year = years[i], variables = vars, grid = c(100, 100), weight = TRUE, hard.shelled = TRUE, variogram.average = 3, units = "t", bug = FALSE)
-   
-   # Use range of 125 km for sparse categories SC4 and SC5:
-   m <- ked.scset(year = years[i], variables = vars, grid = c(100, 100), variogram.average = 3, bug = FALSE, max.distance = 75)
-   print(c(years[i], nrow(m$data)))
 
-   res[[i]] <- summary.ked(m, polygon = p["gulf"])
-}
+# Use range of 125 km for sparse categories SC4 and SC5:
+m <- ked(s, variables = categories[1], grid = c(100, 100), variogram.average = 3, max.distance = 75)
 
-r <- NULL
-for (i in 1:length(res)){
-   r <- rbind(r, cbind(list(year = as.numeric(names(res)[i])), res[[i]]))
-}
+# Calculate abundance or biomass:
+res <- summary.ked(m, polygon = p)
 
-# Fill-in 
+# Write results:
+write.table(res, file = paste0(path, "abundance.2020.csv"), row.names = FALSE, sep = ",")
+
+
+
+# Fill-in
 index <- is.na(r$sd)
 
-slog = sqrt(log((r$sd.sample[index]^2)/(r$mean[index]^2)+1));                                                                            
-mlog = log(r$mean[index])-(slog^2)/2;                                                                                       
-cilog = exp(cbind(mlog - 1.959964 * slog, mlog + 1.959964 *slog)); 
-            
+slog = sqrt(log((r$sd.sample[index]^2)/(r$mean[index]^2)+1));
+mlog = log(r$mean[index])-(slog^2)/2;
+cilog = exp(cbind(mlog - 1.959964 * slog, mlog + 1.959964 *slog));
+
 r$lowerCI[index] <- r$mean[index] - 1.96 * r$sd.sample[index] / sqrt(r$n.sample[index])
 r$upperCI[index] <- r$mean[index] + 1.96 * r$sd.sample[index] / sqrt(r$n.sample[index])
 
@@ -99,7 +98,7 @@ axis(1, at = seq(1999, 2018, by = 4))
 mtext("Abundance (millions)", 2, 2.5, cex = 1.25)
 mtext("Year", 1, 2.5, cex = 1.25)
 box()
-legend("topright", 
+legend("topright",
        legend = c("Total adult male", "Adult male >= 95mm", "Adult male < 95mm"),
        pch = pch,
        lty = lty,
@@ -132,11 +131,11 @@ axis(1, at = seq(1997, 2018, by = 4))
 axis(1, at = seq(1999, 2018, by = 4))
 if (language == "french") mtext("Abondance (millions)", 2, 2.5, cex = 1.25)
 if (language == "english") mtext("Abundance (millions)", 2, 2.5, cex = 1.25)
-if (language == "french") mtext("Année", 1, 2.5, cex = 1.25)
+if (language == "french") mtext("Ann?e", 1, 2.5, cex = 1.25)
 if (language == "english") mtext("Year", 1, 2.5, cex = 1.25)
-if (language == "french") str <- c("Femelle mature", "Femelle pubère")
+if (language == "french") str <- c("Femelle mature", "Femelle pub?re")
 if (language == "english") str <- c("Mature female", "Pubescent female")
-legend("topright", 
+legend("topright",
        legend = str,
        pch = pch,
        lty = lty,
@@ -144,8 +143,8 @@ legend("topright",
        pt.cex = 1.25,
        cex = 1.25,
        bg = "white")
-box()  
-  
+box()
+
 # Primiparous and multiparous females:
 language <- "french"
 clg()
@@ -170,12 +169,12 @@ axis(1, at = seq(1997, 2018, by = 4))
 axis(1, at = seq(1999, 2018, by = 4))
 if (language == "french") mtext("Abondance (millions)", 2, 2.5, cex = 1.25)
 if (language == "english") mtext("Abundance (millions)", 2, 2.5, cex = 1.25)
-if (language == "french") mtext("Année", 1, 2.5, cex = 1.25)
+if (language == "french") mtext("Ann?e", 1, 2.5, cex = 1.25)
 if (language == "english") mtext("Year", 1, 2.5, cex = 1.25)
 if (language == "french") str <- c("Femelle primipare", "Femelle multipare")
 if (language == "english") str <- c("Primiparous female", "Multiparous female")
 box()
-legend("topright", 
+legend("topright",
        legend = rev(str),
        pch = rev(pch),
        lty = rev(lty),
@@ -183,8 +182,8 @@ legend("topright",
        pt.cex = 1.25,
        cex = 1.25,
        bg = "white")
-       
-              
+
+
 area <- function(x){
    tmp <- deg2km(x$longitude, x$latitude, long.ref = -66, lat.ref = 45.5, method = "ellipsoid")
    return(area.polygon(as.polygon(tmp$x, tmp$y)))
@@ -212,12 +211,12 @@ for (i in 1:length(years)){
    lines(c(years[i]-0.2, years[i]+0.2), c(upperCI[i], upperCI[i]), lwd = 2)
 }
 
-reported <- c(35795, 31681, 40291, 
-              63162, 55965, 71022, 
-              74997, 65822, 85086, 
-              65868, 56283, 76610, 
-              67534, 60994, 74579, 
-              58808, 52754, 65466, 
+reported <- c(35795, 31681, 40291,
+              63162, 55965, 71022,
+              74997, 65822, 85086,
+              65868, 56283, 76610,
+              67534, 60994, 74579,
+              58808, 52754, 65466,
               99145, 87749, 111600,
               66021, 57456, 75495)
 mu.reported <- reported[seq(1, length(reported), by = 3)]
@@ -240,17 +239,17 @@ for (i in 1:length(m$variogram)){
 library(akima)
 for (i in 1:1){
    mu <- m$map[,,i]
-   lon <- m$map.longitude 
+   lon <- m$map.longitude
    lat <- m$map.latitude
-   index <- !is.na(lon) & !is.na(lat) & !is.na(mu) 
+   index <- !is.na(lon) & !is.na(lat) & !is.na(mu)
    mu <- mu[index]
    lon <- lon[index]
    lat <- lat[index]
-   
+
    xx <- seq(-66.5, -60, len = 400)
-   yy <- seq(45, 49, len = 400)    
+   yy <- seq(45, 49, len = 400)
    zz <- interp(x = lon, y = lat, z = mu, xo = xx, yo = yy,  linear = TRUE, extrap = TRUE, duplicate = "mean")$z
-   
+
    xxx <- repvec(xx, nrow = length(yy))
    yyy <- repvec(yy, ncol = ncol(xxx))
    xxx <- t(xxx)
@@ -258,7 +257,7 @@ for (i in 1:1){
    index <- in.polygon(as.polygon(p$gulf$longitude, p$gulf$latitude), xxx, yyy)
    dim(index) <- dim(zz)
    zz[!index] <- NA
-   
+
    cols <- colorRampPalette(c("blue", "yellow", "orange", "red", "darkred"))
    windows()
    gulf.map(land = FALSE, xlim = c(-66, -60), ylim = c(45.6, 49.1))
@@ -267,13 +266,13 @@ for (i in 1:1){
    wind.rose()
    box()
    lines(scz$scz$longitude, scz$scz$latitude, lwd = 2, col = "black")
-    
+
    # Display cross-validated residuals:
    r <- m$data[, m$variables[i]] - m$cross.validation[, i]
    index <- r >=0
    points(longitude.scset(m$data)[index], latitude.scset(m$data)[index], cex = 0.05 * sqrt(r[index]), col = "red", lwd = 2)
    points(longitude.scset(m$data)[!index], latitude.scset(m$data)[!index], cex = 0.05 * sqrt(-r[!index]), col = "black", lwd = 2)
-    
+
    for (j in 1:8) lines(p[[j]]$longitude, p[[j]]$latitude)
 }
 
@@ -304,4 +303,3 @@ for (i in 3:9){
 
 
 
- 
