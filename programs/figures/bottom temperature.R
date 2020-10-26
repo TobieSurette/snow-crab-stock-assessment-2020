@@ -84,8 +84,6 @@ zones <- c("12", "12E", "12F")
 p <- read.gulf.spatial("fishing zone vertices", file = "shp", species = 2526, region = "gulf", zone = zones)
 plot(p, add = TRUE)
 
-
-
 #map.fishing.zones(species = 2526, lwd = 2)
 index <- y > 0
 scale <- 1.1
