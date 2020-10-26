@@ -1,4 +1,5 @@
 library(gulf.data)
+library(gulf.stats)
 library(gulf.spatial)
 
 # Define years:
@@ -8,17 +9,13 @@ category <- "COM"
 # Calculate empirical variograms:
 v <- vector("list", length(years))
 for (i in 1:length(years)){
-   # Read set data:
-   s <- read.scsset(year = years[i], valid = 1)
-   s <- s[survey(s) == "regular", ]
-
-   # Read biological data:
-   b <- read.scsbio(year = years[i], valid = 1)
-   b <- b[survey(b) == "regular", ]
+   s <- read.scsset(year = years[i], survey = "regular", valid = 1) # Set data.
+   b <- read.scsbio(year = years[i], survey = "regular", valid = 1) # Biological data.
    b$tow.id <- tow.id(b)
    import(s, fill = 0) <- catch(b, category = category, weight = TRUE, hard.shelled = TRUE, units = "kg")
-   s[vars] <- 1000000 * s[category] / repvec(s$swept.area, ncol = length(vars))
+   s[category] <- 1000000 * s[category] / repvec(s$swept.area, ncol = length(category))
 
+   # Fit variogram:
    v[[i]] <- variogram(s, variable = category, lag = 3, max.distance = 75, fit = TRUE, inits = list(range = 20))
 }
 names(v) <- years

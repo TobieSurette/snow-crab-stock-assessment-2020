@@ -2,27 +2,29 @@ library(gulf.data)
 library(gulf.stats)
 library(gulf.spatial)
 
-year <- 2020
+year <- 2020 # Survey year.
 
 # Read data:
-s <- read.scsset(year = year, valid = 1) # Tow data.
-b <- read.scsbio(year = year)            # Catch data.
+s <- read.scsset(year = year, survey = "regular", valid = 1) # Tow data.
+b <- read.scsbio(year = year, survey = "regular")            # Biolgical data.
 
 # Define catch categories:
 categories <- c("COM", "COMSC12", "COMSC345")
-import(s) <- catch(b, category = categories, weight = TRUE, hard.shelled = TRUE, units = "t") # Merge catches.
+import(s, fill = 0) <- catch(b, category = categories, weight = TRUE, hard.shelled = TRUE, units = "t") # Merge catches.
 s[categories] <- 1000000 * s[categories] / repvec(s$swept.area, ncol = length(categories))   # Convert to tonnes per km2.
 
 # Read previous two years for variogram averaging:
-ss <- read.scsset(year = (year-2):(year-1), valid = 1)
-ss <- ss[substr(ss$tow.id,2,2) != "C", ]
-bb <- read.scsbio(year = (year-2):(year-1))
-bb <- bb[substr(bb$tow.id,2,2) != "C", ]
-import(ss) <- catch(bb, category = categories, weight = TRUE, hard.shelled = TRUE, units = "t")
+ss <- read.scsset(year = (year-2):(year-1), survey = "regular", valid = 1)
+bb <- read.scsbio(year = (year-2):(year-1), survey = "regular")
+import(ss, fill = 0) <- catch(bb, category = categories, weight = TRUE, hard.shelled = TRUE, units = "t")
 ss[categories] <- 1000000 * ss[categories] / repvec(ss$swept.area, ncol = length(categories))
 
+# Determine kriging coordinates:
+
 # Merge the three years together:
-s <- rbind(ss, s[names(ss)])
+s[setdiff(names(ss), names(s))] <- NA
+ss[setdiff(names(s), names(ss))] <- NA
+s <- rbind(ss[names(s)], s)
 
 # Perform kriging:
 m <- ked(s, variables = categories, variogram.average = 3, grid = c(100, 100), bug = FALSE, max.distance = 150)
