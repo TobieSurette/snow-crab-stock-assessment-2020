@@ -18,8 +18,9 @@ b$weight <- weight(b, hard.shelled = TRUE, units = "kg")
 res <- catch(b, category = c("COM", "COM SC345"), weight = TRUE, hard.shelled = TRUE, units = "kg")
 names(res) <- c("date", "tow.id", "commercial.weight", "commercial345.weight")
 import(s, fill = 0) <- res
-category <- c("COM", "COM SC345", "MIGE95", "M", "F", "T")
-names <- c("commercial.count", "commercial345.count", "male.legal.immature.count", "male.count", "female.count", "total.count")
+category <- c("COM", "COM SC345", "MIGE95", "M", "F", "FM", "FI", "T")
+names <- c("commercial.count", "commercial345.count", "male.legal.immature.count", "male.count",
+           "female.count", "female.mature.count", "female.immature.count", "total.count")
 res <- catch(b, category = category)
 names(res) <- c("date", "tow.id", names)
 import(s, fill = 0) <- res
@@ -46,13 +47,13 @@ vars <- c("date", "zone", "tow.number", "tow.id",
           "commercial.count", "commercial.weight",
           "commercial345.count", "commercial345.weight",
           "male.legal.immature.count",
-          "male.count", "female.count", "total.count")
+          "male.count", "female.count", "female.mature.count", "female.immature.count", "total.count")
 
 # Sort data:
 s <- sort(s, by = c("date", "tow.number"))
 s <- s[vars]
 
-write.table(s, file = paste0("data/export/snow crab survey summary ", year, ".csv"), sep = ",", row.names = FALSE)
+write.table(s, file = paste0("results/tables/english/snow crab survey catch summary ", year, ".csv"), sep = ",", row.names = FALSE)
 
 # Survey summary for RAP document:
 vars <- c("date", "zone", "tow.number", "latitude", "longitude", "swept.area", "depth.meters",
@@ -64,5 +65,5 @@ tmp$commercial.weight <- round(tmp$commercial.weight, 1)
 tmp$commercial345.weight <- round(tmp$commercial345.weight, 1)
 tmp$tow.type <- gsub("Primary", "P", tmp$tow.type)
 tmp$tow.type <- gsub("lternate ", "", tmp$tow.type)
-write.table(tmp, file = paste0("results/tables/english/scs.tow.summary.", year, ".csv"), sep = ",", row.names = FALSE)
+write.table(tmp, file = paste0("results/tables/english/snow crab survey tow summary ", year, ".csv"), sep = ",", row.names = FALSE)
 

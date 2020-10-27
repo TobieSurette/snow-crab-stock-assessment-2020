@@ -21,7 +21,7 @@ import(s, fill = 0) <- catch(b, category = categories, weight = TRUE, hard.shell
 s[categories] <- 1000000 * s[categories] / repvec(s$swept.area, ncol = length(categories))   # Convert to tonnes per km2.
 
 # Perform kriging:
-m <- ked(s, variables = categories, variogram.average = 3, grid = c(100, 100), max.distance = 75)
+m <- ked(s, variables = categories, variogram.average = 3, lag = 3, max.distance = 75)
 
 # Calculate abundance or biomass:
 res <- summary.ked(m, polygon = p)

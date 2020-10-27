@@ -102,8 +102,17 @@ if (jpeg) dev.off()
 # Save tables:
 res <- sort(res, by = c("maturity", "year"))
 res[c("mu", "sigma", "lci", "uci")] <- round(res[c("mu", "sigma", "lci", "uci")], 1)
+if (language == "french"){
+   names <- names(res)
+   names <- gsub("year", "annee", names)
+   names <- gsub("maturity", "maturite", names)
+   names <- gsub("lci", "int.conf.bas", names)
+   names <- gsub("uci", "int.conf.haut", names)
+   names(res) <- names
+}
+
 if (tables){
-   path <- paste0("results/tables", path.name)
+   path <- paste0("results/tables/", language.str, "/", path.name)
    if (file.exists(path)) dir.create(path)
    write.csv(res, file = paste0(path, file.name, ".csv"), row.names = FALSE)
 }

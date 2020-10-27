@@ -26,7 +26,7 @@ import(s, fill = 0) <- catch(b, category = categories) # Merge catches.
 s[categories] <- s[categories] / repvec(s$swept.area, ncol = length(categories)) # Standardize by swept area.
 
 # Perform kriging with external drift:
-m <- ked(s, variables = categories, grid = c(100, 100), variogram.average = 3, max.distance = 75)
+m <- ked(s, variables = categories, variogram.average = 3, lag = 3, max.distance = 75)
 
 # Calculate abundance:
 res <- summary.ked(m, polygon = p)
