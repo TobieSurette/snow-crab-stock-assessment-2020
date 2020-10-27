@@ -3,13 +3,13 @@ library(gulf.spatial)
 
 # Prepare data export for industry and partners:
 year <- 2020
+language <- "french"
 
 # Read tow data:
 s <- read.scsset(year = year, valid = 1, survey = "regular")
 s$longitude <- lon(s)
 s$latitude <- lat(s)
 s$stop.time <- s$stop.time.logbook
-
 
 # Read biological data:
 b <- read.scsbio(year = year, survey = "regular")
