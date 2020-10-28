@@ -24,7 +24,7 @@ s[categories] <- 1000000 * s[categories] / repvec(s$swept.area, ncol = length(ca
 m <- ked(s, variables = categories, variogram.average = 3, lag = 3, max.distance = 75)
 
 # Calculate abundance or biomass:
-res <- summary.ked(m, polygon = p)
+res <- summary(m, polygon = p)
 
 # Add description:
 res <- cbind(res["variable"],

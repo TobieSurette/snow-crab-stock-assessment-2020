@@ -35,7 +35,7 @@ for (i in 1:length(m$variables)){
    # Prepare output graphics device:
    file <- paste("density map -", tolower(category(m$variables[i], language = language)), "-", year)
    file <- paste0(path, "/", file)
-   gdevice(output, file = file)
+   gdevice(output, file = file, width = 11, height = 8.5)
 
    # Background map:
    map.new(xlim = c(-66.5, -60-1/6), ylim = c(45.5, 49+1/6))
@@ -55,16 +55,18 @@ for (i in 1:length(m$variables)){
    dim(index) <- dim(zz)
    zz[!index] <- NA
 
+   # Define colour palette:
    cols <- colorRampPalette(c("blue4", "blue", "mediumturquoise", "yellow", "orange", "red", "darkred"))
 
    # Rescale weights:
    if (weight) zz <- 1000 * zz
 
+   # Define contour breaks:
    breaks = c(seq(0, 15000, by = 1500), 100000)
-   if (m$variables[i] == "COM")      breaks = c(seq(0, 3000, by = 300), 10000)
-   if (m$variables[i] %in% c("COMSC12", "COMSC345"))  breaks = c(seq(0, 2000, by = 200), 10000)
-   if (substr(m$variables[i],1,2) == "MI") breaks = c(seq(0, 15000, by = 1500), 100000)
-   if (substr(m$variables[i],1,1) == "F") breaks = c(seq(0, 30000, by = 3000), 100000)
+   if (m$variables[i] == "COM")                      breaks = c(seq(0, 3000, by = 300), 10000)
+   if (m$variables[i] %in% c("COMSC12", "COMSC345")) breaks = c(seq(0, 2000, by = 200), 10000)
+   if (substr(m$variables[i],1,2) == "MI")           breaks = c(seq(0, 15000, by = 1500), 100000)
+   if (substr(m$variables[i],1,1) == "F")            breaks = c(seq(0, 30000, by = 3000), 100000)
 
    # Density:
    image(x, y, zz, add = TRUE, col = cols(length(breaks)-1), breaks = breaks)
