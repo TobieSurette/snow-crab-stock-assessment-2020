@@ -33,7 +33,10 @@ x <- seq(-66.5, -60, len = 400)
 y <- seq(45, 49, len = 400)
 for (i in 1:length(m$variables)){
    # Prepare output graphics device:
-   file <- paste("density map -", tolower(category(m$variables[i], language = language)), "-", year)
+   file <- paste("density map -",
+                 tolower(category(m$variables[i], language = language)),
+                 ifelse(weight, "biomass", "abundance"), "-",
+                 year)
    file <- paste0(path, "/", file)
    gdevice(output, file = file, width = 11, height = 8.5)
 
