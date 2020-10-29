@@ -4,12 +4,12 @@ library(gulf.graphics)
 library(gulf.spatial)
 
 # Program options:
-year <- 2020                                 # Survey year.
+year <- 2017                                 # Survey year.
 output <- "pdf"                              # Output format.
 language <- language("en")                   # Output language.
 categories <- c("COM","COMSC12","COMSC345")  # Define catch categories.
 #categories <- c("MIGE34L45", "MIGE56L69", "MIGE69L83", "MIGE83", "MIGE83L98", "MIGE83L98SC345", "FI", "FIGNO", "FM", "FP", "FMULT")
-weight <- FALSE                              # Whether to convert counts to weights.
+weight <- TRUE                              # Whether to convert counts to weights.
 path <- paste0("results/figures/", language, "/maps") # File output path.
 if (weight & (language == "french"))   path <- paste0(path, "/biomasse/")
 if (weight & (language == "english"))  path <- paste0(path, "/biomass/")
