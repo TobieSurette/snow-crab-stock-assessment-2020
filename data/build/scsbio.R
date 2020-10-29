@@ -70,6 +70,18 @@ x <- x[vars]
 # Date fix:
 x$date[(x$date == "2020-07-12") & (x$tow.id == "GP354F")] <- "2020-07-13"
 
+# Tow number fixes:
+x$tow.number[(x$tow.id == "GP049A1")] <- 2
+x$tow.number[(x$tow.id == "GP026F")] <- 3
+x$tow.number[(x$tow.id == "GP024F")] <- 4
+x$tow.number[(x$tow.id == "GP036F")] <- 5
+x$tow.number[(x$tow.id == "GP046F")] <- 6
+x$tow.number[(x$tow.id == "GP067F")] <- 7
+x$tow.number[(x$tow.id == "GP091A1")] <- 9
+x$tow.number[(x$tow.id == "GP066A1")] <- 11
+x$tow.number[(x$tow.id == "GP048F")] <- 12
+
+# Write to file:
 write.csv(x, file = "data/scs.bio.2020.csv", row.names = FALSE)
 
 # Update gulf.data repo:
@@ -81,43 +93,3 @@ if (file.exists("C:/Users/SuretteTJ/Desktop/gulf.data")){
 if (file.exists("/Users/crustacean/Desktop/gulf.data")){
    write.csv(x, file = "/Users/crustacean/Desktop/gulf.data/inst/extdata/scs.bio.2020.csv", row.names = FALSE)
 }
-
-
-# x <- write.csv("data/scs.bio.2020.csv", header = TRUE, row.names = FALSE)
-
-# # Load tow data:
-# y <- read.scset(year = 2020)
-#
-# # Check for data with non-valid tows:
-# index <- match(x$tow.id, y$tow.id)
-# table(y$valid[index])
-#
-# # Check that dates match:
-# which((y$year[index] != x$year) | (y$month[index] != x$month) | (y$day[index] != x$day))
-#
-# # Check that tow numbers match:
-# which(y$tow.number[match(x$tow.id, y$tow.id)] != x$tow.number)
-#
-# # Check that crab numbers are sequential within tows:
-# x <- sort(x, by = c("year", "month", "day", "tow.number", "crab.number"))
-# aggregate(x$crab.number, by = x["tow.id"], function(x) if (length(x) == 1) return(1) else return( unique(diff(x))))
-#
-# # Check indexing variables:
-# tmp <- aggregate(x$tow.id, by = cbind(substr(x$tow.id, 2, 2), x[c("month", "day", "tow.number")]), function(x) length(unique(x)))
-# dim(unique(cbind(substr(x$tow.id, 2, 2), x[c("month", "day", "tow.number")])))[1] == length(unique(x$tow.id))
-#
-# # Convert to 'scbio' object:
-# xx <- scsbio(x)
-#
-# tows <- unique(x[c("month", "day", "tow.number", "tow.id")])
-# for (i in 1:nrow(tows)){
-#    index <- gsub(" ", "", xx$tow.id) == tows$tow.id[i]
-#    #file <- paste0("GCR", substr(x$year[i], 3, 4), convert.vector(i, to = "a3", fill = "0"), ".txt")      # Old file name format.
-#    file <- paste0(tows$tow.id[i], ".txt")
-#    print(paste0("U:/Snow Crab/Stock Assessment 2019/", file))
-#    write(xx[index, ], file = paste0("U:/Snow Crab/Stock Assessment 2019/", file))
-# }
-#
-# # Update R and CSV file versions:
-# update.scbio(year = 2019)
-

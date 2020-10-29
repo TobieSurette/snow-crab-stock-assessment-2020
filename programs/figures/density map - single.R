@@ -7,12 +7,14 @@ library(gulf.spatial)
 year <- 2020                                 # Survey year.
 output <- "pdf"                              # Output format.
 language <- language("en")                   # Output language.
-path <- paste0("results/figures/", language, "/maps") # File output path.
 categories <- c("COM","COMSC12","COMSC345")  # Define catch categories.
 #categories <- c("MIGE34L45", "MIGE56L69", "MIGE69L83", "MIGE83", "MIGE83L98", "MIGE83L98SC345", "FI", "FIGNO", "FM", "FP", "FMULT")
-weight <- TRUE                              # Whether to convert counts to weights.
-
-categories <- categories[1]
+weight <- FALSE                              # Whether to convert counts to weights.
+path <- paste0("results/figures/", language, "/maps") # File output path.
+if (weight & (language == "french"))   path <- paste0(path, "/biomasse/")
+if (weight & (language == "english"))  path <- paste0(path, "/biomass/")
+if (!weight & (language == "french"))  path <- paste0(path, "/abondance/")
+if (!weight & (language == "english")) path <- paste0(path, "/abundance/")
 
 # Load kriging polygons:
 p <- read.gulf.spatial("kriging polygons revised")["gulf"]
@@ -22,7 +24,7 @@ s <- read.scsset(year = (year-2):year, survey = "regular", valid = 1) # Tow data
 b <- read.scsbio(year = (year-2):year, survey = "regular")            # Biological data.
 
 # Import catch data:
-import(s, fill = 0) <- catch(b, category = categories, weight = weight, hard.shelled = TRUE, units = "t") # Merge catches.
+import(s, fill = 0) <- catch(b, category = categories, weight = weight, as.hard.shelled = TRUE, units = "t") # Merge catches.
 s[categories] <- 1000000 * s[categories] / repvec(s$swept.area, ncol = length(categories))   # Convert to tonnes per km2.
 
 # Perform kriging:
@@ -33,11 +35,8 @@ x <- seq(-66.5, -60, len = 400)
 y <- seq(45, 49, len = 400)
 for (i in 1:length(m$variables)){
    # Prepare output graphics device:
-   file <- paste("density map -",
-                 tolower(category(m$variables[i], language = language)),
-                 ifelse(weight, "biomass", "abundance"), "-",
-                 year)
-   file <- paste0(path, "/", file)
+   file <- paste0(year, " - ", tolower(category(m$variables[i], language = language, symbols = FALSE)))
+   file <- paste0(path,  file)
    gdevice(output, file = file, width = 11, height = 8.5)
 
    # Background map:
@@ -66,8 +65,9 @@ for (i in 1:length(m$variables)){
 
    # Define contour breaks:
    breaks = c(seq(0, 15000, by = 1500), 100000)
-   if (m$variables[i] == "COM")                      breaks = c(seq(0, 3000, by = 300), 10000)
-   if (m$variables[i] %in% c("COMSC12", "COMSC345")) breaks = c(seq(0, 2000, by = 200), 10000)
+   if (weight & m$variables[i] == "COM")             breaks = c(seq(0, 3000, by = 300), 10000)
+   if (!weight & m$variables[i] %in%  c("COM", "COMSC12", "COMSC345")) breaks = c(seq(0, 5000, by = 500), 10000)
+   if (weight & (m$variables[i] %in% c("COMSC12", "COMSC345"))) breaks = c(seq(0, 2000, by = 200), 10000)
    if (substr(m$variables[i],1,2) == "MI")           breaks = c(seq(0, 15000, by = 1500), 100000)
    if (substr(m$variables[i],1,1) == "F")            breaks = c(seq(0, 30000, by = 3000), 100000)
 
@@ -110,12 +110,12 @@ for (i in 1:length(m$variables)){
    map.axis(c(1,4))
 
    # Title:
-   mtext(category(m$variables[i], language = language), 3, 1.00, cex = 1.25)
+   mtext(category(m$variables[i], language = language, simplify = FALSE), 3, 1.00, cex = 1.25)
 
    # Info and stats:
    text(par("usr")[1] + 0.9 * diff(par("usr")[1:2]),
         par("usr")[3] + 0.9 * diff(par("usr")[3:4]),
-        year, cex = 1.5)
+        year, cex = 1.75)
 
    if (output %in% c("pdf", "jpeg", "jpg")) dev.off()
 }
