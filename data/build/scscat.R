@@ -1,3 +1,5 @@
+library(gulf.data)
+
 # Files to treat:
 x <- read.csv("data/raw/scs.cat.2020.csv", header = TRUE, stringsAsFactors = FALSE)
 names(x) <- tolower(names(x))
@@ -48,29 +50,6 @@ y$tow.number <- s$tow.number[index]
 # Re-order columns:
 y <- y[c("date", "tow.number", "tow.id", "species", "number.caught", "weight.caught", "presence", "comment")]
 
-# Spot corrections:
-#y$number.caught[which(y$tow.id == "GP354F" & y$species == 2527)] <- 3
-#y$weight.caught[which(y$tow.id == "GP354F" & y$species == 2527)] <- 0.43
-
-#==============================================================================================================================
-
-#y$species[y$tow.id == "GP354F" & y$species == 41] <- 40
-#y$number.caught[y$tow.id == "GP350F" & y$species == 40] <- 172
-#y$weight.caught[y$tow.id == "GP019F" & y$species == 42] <- 0.278
-#y$weight.caught[y$tow.id == "GP027F" & y$species == 64] <- 0.02
-#y$weight.caught[y$tow.id == "GP130F" & y$species == 340] <- 0.008
-#y$number.caught[y$tow.id == "GP100F" & y$species == 1510] <- 1
-#y$species[y$tow.id == "GP231F" & y$species == 2524] <- 2513
-#y$number.caught[y$tow.id == "GP320F" & y$species == 23] <- 1169
-#y$weight.caught[y$tow.id == "GP320F" & y$species == 23] <- 153.79
-#y$number.caught[y$tow.id == "GP282F" & y$species == 23] <- 188
-#y$weight.caught[y$tow.id == "GP128A2" & y$species == 6400] <- 3.36
-#y$species[y$tow.id == "GP107F" & y$species == 8300] <- 8600
-#y$number.caught[y$tow.id == "GP350F" & y$species == 201] <- 30
-#y$number.caught[y$tow.id == "GP084A1" & y$species == 300] <- 2
-#y$number.caught[y$tow.id == "GP236A1" & y$species == 302] <- 2
-#y$number.caught[y$tow.id == "GP057F" & y$species == 340] <- 2
-
 # Check individual species entries:
 i = 1
 species(species[i])
@@ -84,3 +63,11 @@ rownames(y) <- NULL
 
 # Write by-catch table:
 write.table(y, file = "data/by-catch/scs.cat.2020.csv", sep = ",", row.names = FALSE)
+
+# Write to gulf.data repository:
+tmp <- unlist(lapply(strsplit(getwd(), "/"), function(x) x[length(x)]))
+path <- paste0(gsub(tmp, "", getwd()), "gulf.data/inst/extdata")
+if (file.exists(path)){
+   file <- paste0(path, "/", "scs.cat.2020.csv")
+   write.csv(x, file = file, row.names = FALSE)
+}
