@@ -4,6 +4,7 @@ year <- 2020
 
 # Files to treat:
 x <- read.csv(paste0("data/raw/scs.cat.", year, ".csv"), header = TRUE, stringsAsFactors = FALSE)
+
 names(x) <- tolower(names(x))
 
 # Parse date:
@@ -51,6 +52,15 @@ y$tow.number <- s$tow.number[index]
 
 # Re-order columns:
 y <- y[c("date", "tow.number", "tow.id", "species", "number.caught", "weight.caught", "presence", "comment")]
+
+# Spot corrections:
+y$species[y$tow.id == "GP165A1" & y$species == 8200] <- 1900
+y$species[y$tow.id == "GP218F" & y$species == 8200] <- 1900
+y$number.caught[y$tow.id == "GP272F" & y$species == 4355] <- 388
+y$weight.caught[y$tow.id == "GP272F" & y$species == 4355] <- 44.1
+y$number.caught[y$tow.id == "GP351F" & y$species == 40] <- 129
+
+
 
 # Check individual species entries:
 i = 1
