@@ -35,7 +35,7 @@ axis(2, at = years, labels = rev(years), las = 2, cex.axis = 0.7)
 for (i in 1:length(years)) lines(par("usr")[1:2], c(years[i]-0.5, years[i]-0.5), col = "grey50", lwd = 0.5)
 at <- c(1, 1 + cumsum(c(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30)))
 for (i in 1:length(at)) lines(c(at[i]-0.5, at[i]-0.5), par("usr")[3:4], col = "grey50", lwd = 1.5)
-if (language == "english") labels <- c("July", "August", "September", "October") else labels <- c("Juillet", "Ao?t", "Septembre", "Octobre")
+if (language == "english") labels <- c("July", "August", "September", "October") else labels <- c("Juillet", "Août", "Septembre", "Octobre")
 axis(1, at = c(197.5, 228.5, 259.0, 282.5), labels = labels, cex.axis = 1)
 
 if (format != "") dev.off()
