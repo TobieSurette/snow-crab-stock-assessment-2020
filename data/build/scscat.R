@@ -1,7 +1,9 @@
 library(gulf.data)
 
+year <- 2020
+
 # Files to treat:
-x <- read.csv("data/raw/scs.cat.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+x <- read.csv(paste0("data/raw/scs.cat.", year, ".csv"), header = TRUE, stringsAsFactors = FALSE)
 names(x) <- tolower(names(x))
 
 # Parse date:
@@ -35,7 +37,7 @@ y <- y[!apply(y[c("weight.caught", "number.caught", "presence")], 1, function(x)
 y$presence[is.na(y$presence) & (!is.na(y$weight.caught) | !is.na(y$number.caught))] <- 1
 
 # Read set of valid tows:
-s <- read.scsset(year = 2020)
+s <- read.scsset(year = year)
 
 # Check that tow IDs exist:
 index <- match(y$tow.id, s$tow.id)
@@ -62,12 +64,12 @@ y <- sort(y, by = c("date", "tow.number", "tow.id", "species"))
 rownames(y) <- NULL
 
 # Write by-catch table:
-write.table(y, file = "data/by-catch/scs.cat.2020.csv", sep = ",", row.names = FALSE)
+write.table(y, file = paste0("data/by-catch/scs.cat.", year, ".csv"), sep = ",", row.names = FALSE)
 
 # Write to gulf.data repository:
 tmp <- unlist(lapply(strsplit(getwd(), "/"), function(x) x[length(x)]))
 path <- paste0(gsub(tmp, "", getwd()), "gulf.data/inst/extdata")
 if (file.exists(path)){
-   file <- paste0(path, "/", "scs.cat.2020.csv")
+   file <- paste0(path, "/", "scs.cat.", year, ".csv")
    write.csv(x, file = file, row.names = FALSE)
 }
