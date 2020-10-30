@@ -1,8 +1,10 @@
 library(gulf.data)
 library(gulf.spatial)
 
+year <- 2020
+
 # Load raw data export:
-x <- read.table("data/raw/scs.set.2020.csv", header = TRUE, sep =",", stringsAsFactors = FALSE, fileEncoding = "Windows-1252")
+x <- read.table(paste0("data/raw/scs.set.", year, ".csv"), header = TRUE, sep =",", stringsAsFactors = FALSE, fileEncoding = "Windows-1252")
 names(x) <- gsub("_", ".", tolower(names(x)))
 
 # Rename fields:
@@ -47,12 +49,6 @@ x$mid.time.logbook[nchar(x$mid.time.logbook) > 8]     <- "        "
 x$stop.time.logbook[nchar(x$stop.time.logbook) > 8]     <- "        "
 x$haul.time <- x$net.end
 
-# Coordinate conversion:
-#x$longitude.start.logbook <- -dmm2deg(x$gpa.lon.start)
-#x$longitude.end.logbook   <- -dmm2deg(x$gpa.lon.end)
-#x$latitude.start.logbook  <- dmm2deg(x$gpa.lat.start)
-#x$latitude.end.logbook    <- dmm2deg(x$gpa.lat.end)
-
 x$longitude.start.logbook <- -abs(x$gpa.lon.start)
 x$longitude.stop.logbook  <- -abs(x$gpa.lon.end)
 x$latitude.start.logbook  <- x$gpa.lat.start
@@ -95,8 +91,8 @@ x$stop.time.logbook[x$tow.id == "GP263F"] <- "10:30:55"
 x$stop.time.logbook[x$tow.id == "GP159F"] <- "12:55:47"
 
 # Load touchdown times:
-if (file.exists("data/raw/scs.touchdown.time.2020.csv")){
-   tmp <- read.csv("data/raw/scs.touchdown.time.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+if (file.exists(paste0("data/raw/scs.touchdown.time.", year, ".csv"))){
+   tmp <- read.csv(paste0("data/raw/scs.touchdown.time.", year, ".csv"), header = TRUE, stringsAsFactors = FALSE)
    x$touchdown.time <- tmp$touchdown[match(x$tow.id, tmp$tow.id)]
    x$touchdown.time[is.na(x$touchdown.time)] <- "        "
    index <- nchar(x$touchdown.time) == 7
@@ -104,8 +100,8 @@ if (file.exists("data/raw/scs.touchdown.time.2020.csv")){
 }
 
 # Load liftoff times:
-if (file.exists("data/raw/scs.liftoff.time.2020.csv")){
-   tmp <- read.csv("data/raw/scs.liftoff.time.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+if (file.exists(paste0("data/raw/scs.liftoff.time.", year, ".csv"))){
+   tmp <- read.csv(paste0("data/raw/scs.liftoff.time.", year, ".csv"), header = TRUE, stringsAsFactors = FALSE)
    x$liftoff.time <- tmp$liftoff[match(x$tow.id, tmp$tow.id)]
    x$liftoff.time[is.na(x$liftoff.time)] <- "        "
    index <- nchar(x$liftoff.time) == 7
@@ -113,8 +109,8 @@ if (file.exists("data/raw/scs.liftoff.time.2020.csv")){
 }
 
 # Load trawl swept area and swept area method:
-if (file.exists("data/raw/scs.swept.area.2020.csv")){
-   tmp <- read.csv("data/raw/scs.swept.area.2020.csv", header = TRUE, stringsAsFactors = FALSE)
+if (file.exists(paste0("data/raw/scs.swept.area.", year, ".csv"))){
+   tmp <- read.csv(paste0("data/raw/scs.swept.area.", year, ".csv"), header = TRUE, stringsAsFactors = FALSE)
    x$swept.area <- tmp$swept.area[match(x$tow.id, tmp$tow.id)]
    x$swept.area.method <- tmp$swept.area.method[match(x$tow.id, tmp$tow.id)]
    x$swept.area.method[is.na(x$swept.area.method)] <- ""
@@ -160,19 +156,10 @@ vars <- c("date", "zone", "tow.number", "tow.id", "valid", tvars, setdiff(vars, 
 x <- x[vars]
 
 # Write to stock assessment repository:
-write.csv(x, file = "data/scs.set.2020.csv", row.names = FALSE)
+write.csv(x, file = paste0("data/scs.set.", year, ".csv"), row.names = FALSE)
 
 # Write to gulf.data repository:
 if (file.exists("/Users/crustacean/Desktop/gulf.data")){
-   file <- "/Users/crustacean/Desktop/gulf.data/inst/extdata/scs.set.2020.csv"
+   file <- paste0("/Users/crustacean/Desktop/gulf.data/inst/extdata/scs.set.", year, ".csv")
    write.csv(x, file = file, row.names = FALSE)
 }
-
-# Write to W: drive:
-if (file.exists(options("gulf.path")$gulf.path$snow.crab)){
-   file <- paste0(options("gulf.path")$gulf.path$snow.crab,
-                  "/Offshore Crab Common/Fishing Year 2020/Trawl Data/South Western Gulf/",
-                  "scs.set.2020.csv")
-   write.csv(x, file = file, row.names = FALSE)
-}
-
