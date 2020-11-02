@@ -1,5 +1,6 @@
 # Regular survey measurements:
-x <- read.csv("data/raw/scs.len.2020.csv", stringsAsFactors = FALSE)
+x <- read.csv(paste0("data/raw/scs.len.", year, ".csv"), header = TRUE, stringsAsFactors = FALSE)
+
 names(x) <- tolower(names(x))
 x$tow.id <- toupper(x$gpnum)
 
@@ -23,4 +24,12 @@ x <- x[vars]
 
 
 # Write to file:
-write.csv(x, "data/by-catch/scs.len.2020.csv", row.names = FALSE)
+write.table(y, file = paste0("data/by-catch/scs.len.", year, ".csv"), sep = ",", row.names = FALSE)
+
+# Write to gulf.data repository:
+tmp <- unlist(lapply(strsplit(getwd(), "/"), function(x) x[length(x)]))
+path <- paste0(gsub(tmp, "", getwd()), "gulf.data/inst/extdata")
+if (file.exists(path)){
+   file <- paste0(path, "/", "scs.cat.", year, ".csv")
+   write.csv(x, file = file, row.names = FALSE)
+}
