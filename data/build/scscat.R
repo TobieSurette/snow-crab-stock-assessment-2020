@@ -38,7 +38,7 @@ y <- y[!apply(y[c("weight.caught", "number.caught", "presence")], 1, function(x)
 y$presence[is.na(y$presence) & (!is.na(y$weight.caught) | !is.na(y$number.caught))] <- 1
 
 # Read set of valid tows:
-s <- read.scsset(year = year)
+s <- squeeze(read.scsset(year = year))
 
 # Check that tow IDs exist:
 index <- match(y$tow.id, s$tow.id)
@@ -60,8 +60,6 @@ y$number.caught[y$tow.id == "GP272F" & y$species == 4355] <- 388
 y$weight.caught[y$tow.id == "GP272F" & y$species == 4355] <- 44.1
 y$number.caught[y$tow.id == "GP351F" & y$species == 40] <- 129
 
-
-
 # Check individual species entries:
 i = 1
 species(species[i])
@@ -81,5 +79,5 @@ tmp <- unlist(lapply(strsplit(getwd(), "/"), function(x) x[length(x)]))
 path <- paste0(gsub(tmp, "", getwd()), "gulf.data/inst/extdata")
 if (file.exists(path)){
    file <- paste0(path, "/", "scs.cat.", year, ".csv")
-   write.csv(x, file = file, row.names = FALSE)
+   write.csv(y, file = file, row.names = FALSE)
 }

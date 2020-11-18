@@ -24,12 +24,12 @@ x <- x[vars]
 
 
 # Write to file:
-write.table(y, file = paste0("data/by-catch/scs.len.", year, ".csv"), sep = ",", row.names = FALSE)
+write.table(x, file = paste0("data/by-catch/scs.len.", year, ".csv"), sep = ",", row.names = FALSE)
 
 # Write to gulf.data repository:
 tmp <- unlist(lapply(strsplit(getwd(), "/"), function(x) x[length(x)]))
 path <- paste0(gsub(tmp, "", getwd()), "gulf.data/inst/extdata")
 if (file.exists(path)){
-   file <- paste0(path, "/", "scs.cat.", year, ".csv")
+   file <- paste0(path, "/", "scs.len.", year, ".csv")
    write.csv(x, file = file, row.names = FALSE)
 }
