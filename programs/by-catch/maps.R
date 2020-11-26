@@ -4,7 +4,7 @@ library(gulf.spatial)
 
 format <- "pdf"
 year <- 2020
-fish <- FALSE
+fish <- TRUE
 if (fish){
    species <- list("American plaice", "redfish unsp", "cod", "Witch flounder", "Thorny skate", "Yellowtail flounder", "white hake", "Halibut")
    species.en <- gsub(" unsp", "", species(unlist(lapply(species(species), function(x) x[1]))))
@@ -37,7 +37,7 @@ colour <- function(x, maximum, col = c("white", "black")){
 }
 
 clg()
-gdevice(format, file = paste0(getwd(), "/results/figures/", year, " - survey.by-catch.", group, ".pdf"),  height = 11, width = 8.5)
+gdevice(format, file = paste0(getwd(), "/results/figures/", year, " - survey.by-catch.", group),  height = 11, width = 8.5)
 m <- kronecker(matrix(1:8, ncol = 2), matrix(1, nrow = 5, ncol = 5))
 m <- rbind(0,0,cbind(0, 0, m, 0),0,0)
 layout(m)
