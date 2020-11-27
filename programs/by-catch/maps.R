@@ -59,7 +59,7 @@ for (i in 1:length(species)){
       index <- which(in.polygon(p, longitude(x), latitude(x)))
       col <- NA
       if (length(index) > 0) col <- x$colour[index]
-      plot(p, col = col, border = "black")
+      plot(p, col = col, border = "black", lwd = 0.5)
    }
    map("coast", col = "floralwhite", border = "saddlebrown", lwd = 0.4)
 
@@ -68,7 +68,7 @@ for (i in 1:length(species)){
           legend = round(legend,1),
           pch = 22,  pt.cex = 3,
           pt.bg = colour(sqrt(legend), max = max(sqrt(x$density))),
-          bg = "white", cex = 1,
+          bg = "white", cex = 1, lwd = 0.5,
           title = expression(paste("mt/km"^"2")))
    text(-61.4, 48.9, species.en[i], cex = 1.1)
    text(-61.4, 48.67, species.fr[i], cex = 1.1)
