@@ -4,6 +4,10 @@ x <- read.csv(paste0("data/raw/scs.len.", year, ".csv"), header = TRUE, stringsA
 names(x) <- tolower(names(x))
 x$tow.id <- toupper(x$gpnum)
 
+# Date correction:
+x$datetime <- gsub("1970-01-03", "2020-07-13", x$datetime)
+
+
 x$date <- unlist(lapply(strsplit(x$datetime, " "), function(x) x[1]))
 x$time <- unlist(lapply(strsplit(x$datetime, " "), function(x) x[2]))
 
