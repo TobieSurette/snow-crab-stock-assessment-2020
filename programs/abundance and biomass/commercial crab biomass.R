@@ -32,6 +32,8 @@ res <- cbind(res["variable"],
              res[setdiff(names(res), "variable")])
 
 # Output:
+vars <- c("area", "mean.sample", "sd.sample", "mean", "sd", "lowerCI", "upperCI", "mean.CV", "mad.CV", "sd.CV")
+res[vars] <- round(res[vars], 1)
 
 # English:
 write.table(res, file = paste0(output, "english/", "commercial.biomass.", year, ".csv"), row.names = FALSE, sep = ",")
