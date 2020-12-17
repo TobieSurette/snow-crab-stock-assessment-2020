@@ -10,7 +10,7 @@ categories <- c("COM", "COMSC12", "COMSC345") # Define catch categories.
 
 # Load kriging polygons:
 p <- read.gulf.spatial("kriging polygons revised")
-p <- p[c("gulf", "zone12", "zone19", "zoneE", "zoneF", "zoneEF_unassigned", "zone19_F_buffer", "zone19_12_buffer")]
+p <- p[c("gulf", "zone12_expanded", "zone12", "zone19", "zoneE", "zoneF", "zoneEF_unassigned", "zone19_F_buffer", "zone19_12_buffer")]
 
 # Read three years of data (for variogram averaging):
 s <- read.scsset(year = (year-2):year, survey = "regular", valid = 1) # Tow data.
