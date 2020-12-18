@@ -17,7 +17,7 @@ s <- read.scsset(year = (year-2):year, survey = "regular", valid = 1) # Tow data
 b <- read.scsbio(year = (year-2):year, survey = "regular")            # Biological data.
 
 # Import catch data:
-import(s, fill = 0) <- catch(b, category = categories, weight = TRUE, hard.shelled = TRUE, units = "t") # Merge catches.
+import(s, fill = 0) <- catch(b, category = categories, weight = TRUE, as.hard.shelled = TRUE, units = "t") # Merge catches.
 s[categories] <- 1000000 * s[categories] / repvec(s$swept.area, ncol = length(categories))   # Convert to tonnes per km2.
 
 # Perform kriging:
