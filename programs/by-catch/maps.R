@@ -3,7 +3,7 @@ library(gulf.graphics)
 library(gulf.spatial)
 
 format <- "pdf"
-year <- 2020
+year <- 2017
 fish <- TRUE
 if (fish){
    species <- list("American plaice", "redfish unsp", "cod", "Witch flounder", "Thorny skate", "Yellowtail flounder", "white hake", "Halibut")
@@ -63,6 +63,7 @@ for (i in 1:length(species)){
    }
    map("coast", col = "floralwhite", border = "saddlebrown", lwd = 0.4)
 
+   # Draw legend:
    legend <- seq(0, sqrt(max(x$density)), len = 6) ^ 2
    legend("bottomleft",
           legend = round(legend,1),

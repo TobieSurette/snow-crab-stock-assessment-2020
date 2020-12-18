@@ -11,7 +11,6 @@ for (i in 1:length(species)){
 
    #y <- read.scscat(2016:2020, species = species("sea urchin"))
 
-
    # Import catches into set data:
    vars <- c("number.caught", "weight.caught")
    import(x, var = vars, fill = 0) <- y
@@ -28,4 +27,3 @@ for (i in 1:length(species)){
 }
 r$number.per.tow[r$species == "Brittle star"] <- NA
 r[c("number.per.tow", "weight.per.tow")]  <- round(r[c("number.per.tow", "weight.per.tow")], 2)
-

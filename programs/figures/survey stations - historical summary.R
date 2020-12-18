@@ -1,24 +1,19 @@
 library(gulf)
 
-years <- setdiff(1988:2019, NULL)
+years <- setdiff(1988:2020, NULL)
 
-radius <- 0.75 
+radius <- 0.75
 jpeg <- TRUE
 
-data <- read.scset(year = years)
-data <- data[substr(data$tow.id, 2, 2) != "C", ]
-data <- data[!((data$year > 2000) & (data$month == 6)), ]
-bad <- data[data$valid == 0, ]
-data <- data[data$valid == 1, ]
-
+data <- read.scsset(year = years, valid = 1, survey = "regular")
 
 clg()
 res <- NULL
-data$station <- station.number(longitude(data), latitude(data), distance.tol = radius*2)
+data$station <- station(lon(data), lat(data), distance.tol = radius*2)
 for (i in 1:(length(years)-1)){
    x <- data[data$year == years[i], ]
    y <- data[data$year == years[i+1], ]
-   d <- distance(longitude(x), latitude(x), longitude(y), latitude(y), pairwise = TRUE)   
+   d <- distance(longitude(x), latitude(x), longitude(y), latitude(y), pairwise = TRUE)
    res <- rbind(res, data.frame(year = years[i+1], same = sum(y$station %in% x$station), new = sum(!(y$station %in% x$station)), bad = sum(bad$year == years[i+1])))
 }
 
@@ -28,7 +23,7 @@ colnames(M) <- years
 
 for (i in 1:length(years)){
    t <- table(data$station[data$year == years[i]])
-   M[names(t), i] <- 1 
+   M[names(t), i] <- 1
 }
 
 if (jpeg){
@@ -75,9 +70,9 @@ if (jpeg){
    windows()
 }
 p <- t[, 1] / apply(t, 1, sum)
-plot(c(2006.5, 2019.5), c(0, 0.25), type = "n", xlab = "", ylab = "", xaxs = "i", yaxs = "i") 
+plot(c(2006.5, 2019.5), c(0, 0.25), type = "n", xlab = "", ylab = "", xaxs = "i", yaxs = "i")
 grid()
-dbarplot(p, width = 1, col = "grey90", add = TRUE) 
+dbarplot(p, width = 1, col = "grey90", add = TRUE)
 p[!(names(p) %in% as.character(2012:2013))] <- 0
 dbarplot(p, width = 1, add = TRUE, col = "grey70")
 
@@ -109,7 +104,7 @@ for (i in 1:length(years)){
     index <- as.numeric(substr(x$tow.id, 3, 5))
     print(sort(index))
     M[index, i] <- x$order
-    
+
     y <- data[data$year == years[i] & as.numeric(substr(data$tow.id, 3, 5)) %in% which(is.na(M[,i])), ]
     y <- y[substr(y$tow.id, 6, 10) != "FR", ]
     t <- table(substr(y$tow.id, 3, 5))
