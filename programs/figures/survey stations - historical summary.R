@@ -1,4 +1,5 @@
-library(gulf)
+library(gulf.data)
+library(gulf.spatial)
 
 years <- setdiff(1988:2020, NULL)
 
@@ -6,32 +7,19 @@ radius <- 0.75
 jpeg <- TRUE
 
 data <- read.scsset(year = years, valid = 1, survey = "regular")
-
-clg()
-res <- NULL
 data$station <- station(lon(data), lat(data), distance.tol = radius*2)
-for (i in 1:(length(years)-1)){
-   x <- data[data$year == years[i], ]
-   y <- data[data$year == years[i+1], ]
-   d <- distance(longitude(x), latitude(x), longitude(y), latitude(y), pairwise = TRUE)
-   res <- rbind(res, data.frame(year = years[i+1], same = sum(y$station %in% x$station), new = sum(!(y$station %in% x$station)), bad = sum(bad$year == years[i+1])))
-}
 
 M <- matrix(NA, nrow = max(data$station), ncol = length(years))
 rownames(M) <- 1:max(data$station)
 colnames(M) <- years
 
 for (i in 1:length(years)){
-   t <- table(data$station[data$year == years[i]])
+   t <- table(data$station[year(data) == years[i]])
    M[names(t), i] <- 1
 }
 
-if (jpeg){
-   jpeg(file = "U:/Snow Crab/Stock Assessment 2019/Survey Station History.jpg", width = 8 * 480, height = 8 * 480, res = 8 * 75)
-}else{
-   windows()
-}
-
+# Survey station history figure:
+pdf(file = "results/figures/Survey Station History.pdf", height = 7, width = 7)
 image(years, as.numeric(rownames(M)), z = t(M), xlab = "", ylab = "", ylim = c(1, 2000), yaxs = "i", col = "grey30")
 grid()
 mtext("Year", 1, 2.5, cex = 1.5)
@@ -40,7 +28,7 @@ box()
 text(2011.9, 1330, "Survey redesign 2012 -", pos = 2, cex = 0.75)
 text(2012.9, 1650, "Survey redesign 2013 -", pos = 2, cex = 0.75)
 text(2005.9, 1135, "Partial redistribution 2006 -", pos = 2, cex = 0.75)
-if (jpeg) dev.off()
+dev.off()
 
 # Where the bad tows occurred during random shuffle years:
 if (jpeg){
