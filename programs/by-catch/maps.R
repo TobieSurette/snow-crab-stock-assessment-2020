@@ -3,13 +3,12 @@ library(gulf.graphics)
 library(gulf.spatial)
 
 format <- "pdf"
-year <- 2017
+year <- 2020
 fish <- TRUE
 if (fish){
-   species <- list("American plaice", "redfish unsp", "cod", "Witch flounder", "Thorny skate", "Yellowtail flounder", "white hake", "Halibut")
-   species.en <- gsub(" unsp", "", species(unlist(lapply(species(species), function(x) x[1]))))
-   species.fr <- gsub(" non spécifié", "", species(unlist(lapply(species(species), function(x) x[1])), language = "fr"))
-   species.fr <- paste0(toupper(substr(species.fr, 1, 1)), substr(species.fr, 2, nchar(species.fr)))
+   species <- list(40, 23, 10, 41, 201, 42, c(12, 35), 30)
+   species.en <- c("American plaice", "Redfish", "Atlantic cod", "Witch flounder", "Thorny skate", "Yellowtail flounder", "White hake", "Halibut")
+   species.fr <- c("Plie canadienne", "Sébaste", "Morue franche", "Plie grise", "Raie épineuse", "Limande à queue jaune", "Merluche blanche", "Flétan Atlantique")
    group <- "fish"
 }else{
    # Invertebrates:
@@ -59,7 +58,7 @@ for (i in 1:length(species)){
       index <- which(in.polygon(p, longitude(x), latitude(x)))
       col <- NA
       if (length(index) > 0) col <- x$colour[index]
-      plot(p, col = col, border = "black", lwd = 0.5)
+      plot(p, col = col, border = "grey60", lwd = 0.4)
    }
    map("coast", col = "floralwhite", border = "saddlebrown", lwd = 0.4)
 
