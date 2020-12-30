@@ -4,7 +4,7 @@ library(gulf.spatial)
 
 format <- "pdf"
 years <- 2013:2020
-fish <- TRUE
+fish <- FALSE
 if (fish){
    species <- list(40, 23, 10, 41, 201, 42, c(12, 35), 30)
    species.en <- c("American plaice", "Redfish", "Atlantic cod", "Witch flounder", "Thorny skate", "Yellowtail flounder", "White hake", "Halibut")
@@ -17,7 +17,7 @@ if (fish){
    species.en <- c("Basket stars", "Brittle star", "Sea squirts", "Lesser toad crab", "Green sea urchins", "Starfish", "Sea cucumbers", "Greater toad crab")
    species.fr <- c("Cornes de boeuf", "Ophuires", "Tuniciers", "Hyas coarctatus", "Oursin vert", "Étoiles de mer", "Cocombres de mer", "Hyas araneus")
    group <- "invertebrates"
-   max <- c(100, 100, 100, 100, 100, 100, 100, 100)
+   max <- c(25, 15, 20, 20, 15, 40, 5, 5)
 }
 
 # Read survey grids:
