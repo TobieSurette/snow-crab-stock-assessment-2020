@@ -1,11 +1,11 @@
 library(gulf.data)
 library(gulf.graphics)
 
-output <- "png"
+output <- "pdf"
 var <- "number.caught"
 z <- list()
 years <- 2013:2019
-species <- c(10)
+species <- c(6600, 6611)
 
 #6300 # Basketstars
 #6400 # Sea urchins
