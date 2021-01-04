@@ -4,7 +4,7 @@ library(gulf.spatial)
 
 format <- "pdf"
 years <- 2013:2020
-fish <- FALSE
+fish <- TRUE
 if (fish){
    species <- list(40, 23, 10, 41, 201, 42, c(12, 35), 30)
    species.en <- c("American plaice", "Redfish", "Atlantic cod", "Witch flounder", "Thorny skate", "Yellowtail flounder", "White hake", "Halibut")
@@ -67,6 +67,11 @@ for(i in 1:length(species)){
          plot(p, col = col, border = "grey60", lwd = 0.4)
       }
       map("coast", col = "floralwhite", border = "saddlebrown", lwd = 0.4)
+
+      # Fishing zones:
+      v <- read.gulf.spatial("fishing zone vertices shp", species = 2526, region = "gulf", label = c("12", "12E", "12F", "19"))
+      v <- subset(v, label %in% c("12", "12E", "12F", "19"))
+      plot(v, add = TRUE)
 
       # Draw legend:
       legend <- seq(0, sqrt(max[i]), len = 6) ^ 2
