@@ -1,10 +1,11 @@
 library(gulf.data)
 library(gulf.graphics)
 
-var <- "weight.caught"
+output <- "png"
+var <- "number.caught"
 z <- list()
 years <- 2013:2019
-species <- c(6400)
+species <- c(10)
 
 #6300 # Basketstars
 #6400 # Sea urchins
@@ -41,16 +42,16 @@ for (year in years){
    lr1 <- log(r[,1])
    lr2 <- log(r[,2])
 
-   clg()
+   #clg()
    r <- lr2-lr1
    z[[year-years[1]+1]] <- r
-   plot(r, ylim = c(-3, 3))
-   grid()
-   abline(0, 0, col = "blue", lwd = 2)
+   #plot(r, ylim = c(-3, 3))
+   #grid()
+   #abline(0, 0, col = "blue", lwd = 2)
 
-   hline(mean(r), col = "red")
-   hline(mean(r) + 1.96 * sd(r) / sqrt(length(r)), col = "red", lty = "dashed")
-   hline(mean(r) - 1.96 * sd(r) / sqrt(length(r)), col = "red", lty = "dashed")
+   #hline(mean(r), col = "red")
+   #hline(mean(r) + 1.96 * sd(r) / sqrt(length(r)), col = "red", lty = "dashed")
+   #hline(mean(r) - 1.96 * sd(r) / sqrt(length(r)), col = "red", lty = "dashed")
 
    #print(year)
    #print(round(100  * (exp(mean(r))-1), 1))
@@ -69,8 +70,13 @@ results$uci <- 100*(exp(results$uci)-1)
 
 ylim <- c(-70, 70)
 if (all(species == 40)) ylim <- c(-45, 45)
+if (all(species == 10)) ylim <- c(-150, 150)
+
+if (length(output) > 0) gdevice(output, file = species(species[1]))
 gbarplot(results$mu, years, grid = TRUE, las = 2, ylim = ylim)
 hline(0, col = "red", lwd = 2)
 error.bar(years, lower = results$lci, upper = results$uci)
 mtext("Year-to-year difference (%)", 2, 2.5, cex = 1.25)
 mtext("Initial survey year", 1, 3.5, cex = 1.25)
+
+if (length(output) > 0) dev.off()
