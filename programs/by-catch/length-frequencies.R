@@ -50,8 +50,10 @@ for (i in 1:length(years)){
    box()
 
    if (i %in% c(6, length(years))) axis(1)
+
+   if (i %in% c(6, 11)) mtext("Length(cm)", 1, 2.5, cex = 1.25)
 }
 
-mtext("Length(cm)", 1, 2.5, cex = 1.25)
+
 
 

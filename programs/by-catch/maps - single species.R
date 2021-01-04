@@ -14,8 +14,8 @@ if (fish){
 }else{
    # Invertebrates:
    species <- list(6300, 6400, 6200, c(6100, 6110:6119, 6121, 6123, 6129, 6135), c(1823, 1827), 6600, 2521, 2527)
-   species.en <- c("Basket stars", "Brittle star", "Sea squirts", "Lesser toad crab", "Green sea urchins", "Starfish", "Sea cucumbers", "Greater toad crab")
-   species.fr <- c("Cornes de boeuf", "Ophuires", "Tuniciers", "Hyas coarctatus", "Oursin vert", "Étoiles de mer", "Cocombres de mer", "Hyas araneus")
+   species.en <- c("Basket stars", "Green sea urchins", "Brittle star", "Starfish", "Sea squirts", "Sea cucumbers", "Lesser toad crab", "Greater toad crab")
+   species.fr <- c("Cornes de boeuf", "Oursin vert", "Ophuires", "Étoiles de mer", "Tuniciers",  "Cocombres de mer", "Hyas coarctatus", "Hyas araneus")
    group <- "invertebrates"
    max <- c(25, 15, 20, 20, 15, 40, 5, 5)
 }
@@ -41,7 +41,7 @@ colour <- function(x, maximum, col = c("white", "black")){
 for(i in 1:length(species)){
    print(species[i])
    clg()
-   gdevice(format, file = paste0(getwd(), "/results/figures/", species.en[i], ".", min(years),  "-", max(years)), height = 11, width = 8.5)
+   gdevice(format, file = paste0(getwd(), "/results/figures/english/maps/by-catch/", species.en[i], ".", min(years),  "-", max(years)), height = 11, width = 8.5)
    m <- kronecker(matrix(1:8, ncol = 2), matrix(1, nrow = 5, ncol = 5))
    m <- rbind(0,0,cbind(0, 0, m, 0),0,0)
    layout(m)
@@ -88,3 +88,5 @@ for(i in 1:length(species)){
    }
    dev.off()
 }
+
+

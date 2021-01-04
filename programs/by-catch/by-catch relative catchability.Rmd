@@ -1,0 +1,238 @@
+---
+title: "By-catch catchability comments"
+author: "Tobie Surette"
+date: "31/12/2020"
+output: pdf_document
+---
+
+# Emphasize the quality of the data set
+
+- Without such quality data, leading to low variability and its ability to track cohorts, we would not be able to make these inferences
+- These are issues that can affect all surveys
+- Trap surveys are even more vaiable, as they are passive engines, vulnerable to the whims of creature behaviour and environmental conditions, along with a fuzzy definbition of local sampled area.
+
+# Darrell Science Response
+
+- Historical survey figure
+   - Survey station reshufflings
+   - Number of new stations since 2013.
+   - Number of grids which have had their survey stations unchanged since 2013
+- Locations of alternative tows.
+- Biomass estimation with and without these stations.
+
+
+## Figures
+
+- Track hair balls for 2017, 2018, 2019 and 2020.
+- Time series of by-catch inter-annual differences.
+- Maps of where by-catch increases occurred.
+
+
+# Sections:
+
+- Prologue on catchability and selectivity mechanisms in trawls.
+- Vessel tracks and latent phase summary
+- Comparative experiment summary
+- By-catch trends
+- Snow crab population modeling
+
+# Conclusions
+
+- The swept area of the latent trawling phase during the 2020 survey was minimized by 1) reducing vessel speed, 2) increasing the winch hauling speed to levels comparable to those of the 2016-2018 surveys, and 3) turning the vessel during along a sideways track during hauling.
+
+The minimization of the latent phase brought by the 2020 changes in fishing protocol means that we may more confidently state that the estimate population indices do represent more unbiased estimates of population abundance and biomass, representing , 
+
+therefore probably represent minimum the trawlable abundance and biomass estimates.
+
+- We can say this as there are few processes which can upwardly bias these estimates in any meaningful way.
+- This seeming removes latent-phase trawling as an important source of bias and therefore 2019 and 2020 are more or less on the same scale.
+- However, the years preceeding 2019 are on a lower scale, i.e.are negatively biased with respect to the catchability level in 2019 and 2020, though again, these are better representations of the true underlying abundances.
+
+- The fact that the underlying causes for the apparent increases in cactchability are unknown makes protocolar proscriptions to control them difficult.
+
+- Confidence in the inferrence of catchability relies on the proper handling of population processes, including their scale and temporal variation. This indirect method of inference is necessariryl more difficult than efficiency experiments and the solution space for these models often need to be restricted by biological and practical considerations. 
+
+- Different solutions often explain the data in comparably well.
+
+
+## Management Implications
+
+
+Snow crab is managed on a quota which is set according to a sliding scale of the survey biomass estimate.
+What are the implications of the increased survey catchability of 2019 and 2020?
+
+As stated previously, it is felt that the minimization of the latent trawling phase and the apparent lack of concommittant response in the biomass index shifts the source of the increase to other unknown catch mechanisms.
+
+This implies that years immediately prior to 2019 are *underestimated* with respect to the reference expliotation 
+rate 
+
+- that for the recent time series, the true exploitation rate was lower than the reference exploitation rate, as prescribed by the harvest control rule.
+
+# Lines of inference
+
+- Indirect lines ofinference for catchability are more uncertain than direct lines.
+- As a method of cross-validation, inferences from other species caught in the survey were also examined to see if they show similar patterns to snow crab.
+
+Characteristics of a good selectivity indicator.
+- Slow dynamics
+- Widely distributed in similar areas to snow crab
+- Limited movement
+
+## Evolution of Spatial Sampling
+
+- Talk about fixed station samnpling and the proportion of new stations which appear from year to year.
+- 
+
+## Trends in catch weights
+
+- Catches of other species in the survey can also provide indirect inferences about trawl catchability. 
+
+- Like snow crab, other bottom-dwelling species have a wide spatial distribution within the survey area.
+
+- Fish species are American plaice and Atlantic cod
+- Invertebrate species are brittlestars, sea cucumbers, lesser toad crab (Hyas coarctatus), and Greater toad crab (H. araneus).
+
+For the purpose of assessing relative catchability from year to year, the following approach was used:
+- Year-to-year catch comparisons were performed for each survey sampling grid from 2013 to 2020.
+- This time period represents the most recent incarnation of the survey, which was assigned 355 new sampling stations in 2013, 
+  which were held more or less fixed in susquent years.
+  
+- Year 2013 coincided with the arrival of the new survey vessel at the time, the CFV Jean Mathieu, followed by the newest vessel, 
+  the CFV Avalon Voyager II in 2019.
+  
+## Indirect inferences of relative catchability
+
+- If we can assume that population processes are smooth from year to year, or if we can establish some baseline    
+  reference for the scale of variability in previous years, then we may partially infer changes in scale of  
+  catchability for species which display a wide spatial distribution within the snow crab survey area.
+
+- Inferences of this sort are made without attempting to model the underlying dynamics other than observe the 
+  changes in scale for in the last few years.
+  
+The complications:
+- Certain species were not necessarily consistently identified between surveys.
+- Inconsistent counting
+- Inconsistent detection of smaller individuals (Hyas coarctatus)
+- Large-scale population dynamics may be possible, American plaice and Atlantic cod both showed relatively 
+  large recruitment pulses in 2019 and 2020. 
+- Differentiating between true recruitment and selectivity or catchability increases requires being able to model 
+  the underlying process in a reasonable way and hopefully teasing out the trawl effects from the underlying 
+  population processes.
+  
+ - In particular the only other important crab species in the survey, lesser and greater toad crab, are of particular
+   interest, though the absence of length sampling for these species makes weighing possible population dynamics    
+   processes against possible changes in catchability impossible.
+
+These inferences are meant to be supportive to trawl catchability rather than central.
+
+# Coda
+
+## Mechanisms
+
+The follow-up to the 2019 survey brought to the fore a number of issues.
+
+Early on in the survey, it became apparent that a larger-than-usual number of crab were being caught, resulting in a record tally of snow crab, a full 25% than the next-largest value (1999) in the 30-year history of the survey, and 37.5% above that of 2018.
+
+Moreover, this increase occurred across a wide range of sizes and in both sexes, ruling out recruitment as a probable cause. 
+
+The spatial sampling design between 2018 and 2019 was very similar, with 319 survey stations being common to the two surveys and the remaining 33 stations being alternate stations, i.e. stations which were moved in 2019 owing to a failed trawling effort at the original station.
+
+This raised a concern that trawl selectivity or catchability had accompanied the change in vessel going from the 2018 to the 2019 survey.
+
+Comparative experiment:
+
+- With some foresight, a side-by-side comparative catch experiment using the old and new survey vessel was performed for the final 40 survey tows in the south-east region of the survey area.
+
+- However, the results from this experiment proved to be at odds with the observed catch increase in the wider survey. In particular, male snow crab catches showed no differences while female snow crab catches proved to be more abundant in the older vessel, the reverse of the expected pattern.
+
+- Reconciling these contrasting results:
+   - There are spatial differences in catchability between the experiment and the wider survey.
+   - The old survey vessel was not faithfully reproducing some relevant aspect of fishing behaviour that was present 
+     in 2018. This may include captain behaviour though these were exchanged during the experiment.
+   - Swept area estimates aboard the old vessel during the experiment were too uncertain for meaningful inference, 
+     owing to device malfunction (~ 35% of tows).
+     
+Latent (passive) trawling phase:
+
+- Detailed investigations using trawl probe and vessel track data revealed that the 2018 survey had tows with a 
+  prolonged latent trawling phase at the end of active trawling, owing to slower-than-usual winching of the trawl 
+  aboard the new survey vessel, along with significant forward momentum of the survey vessel during this phase.
+  
+- This process was proposed as a possible mechanism to explain the increase in trawl catches, though trawl behaviour 
+  during the latent phase, i.e. whether it is properly catching crab or not, is unknown, though reasonable estimates 
+  of the extent of swept area were made.
+  
+- The mere existence of the latent phase was problematic, as it represented a significant source of hitherto 
+  unaccounted swept area, the variable used to standardize catches.
+  
+- While the proportion of latent swept area for each tow was significant, on the order of 30-40%, the relative 
+  increase in total swept (active + latent) area between 2018 and 2019 was ~12%. Thus this represented the average 
+  value that this proposed mechanism could explain. 
+  
+Correctives for the 2020 survey:
+
+- For the 2020 survey, some corrective measures for identified issues were incorporated into the protocol.
+- The operating winch speed was increased to match that from previous years.
+- The vessel speed after the tow stop signal was slowed to a lower rate, comparable to earlier years in the survey.
+- The vessel direction was not necessarily maintained, and small vessel drifting is now observed.
+
+Did it work?
+
+- The expectation was that catches would decrease by some reasonable amount in 2020.
+
+- The much decreased survey vessel speed during the latent phase, plus the sideways manoeuring away from the trawl track, would imply that efficient trawling of the sea bottom should be much reduced.
+- However, survey catches in 2020 did not change significantly from 2019.
+- In fact, they seemed to have changed very little
+At the face of it, the correctives added to the 2020 survey had little effect, with the total number of crab caught having changed very little, and this extends to key crab categories, immature males, immature males, mature and commercial males and mature females.
+
+- The exception is a significant increase in instar VII crab (~30 CW).which saw a substantial increase in 2020.
+
+- Thus, given the assumption that 2019 saw a change in selectivity or catchability, we are still at an impasse in 2020 as to the likely mechanism behind the increase.
+
+- It seems less likely that the proposed latent trawling mechanism proposed in 2019 is the main source in the observed   change in catch level.
+- This was odd, as the swept area represented by the latent phase was shown, at least in theory, significant.
+- If we assume that the correctives brought about in 2020 significantly reduced the swept area of the latent phase, then the lack of change in survey catches implies that the efficiency during the latent phase is much less that that of the active trawling phase.
+
+Thus having barred our proposed mechanism, what other avenues of investigation remain to us?
+
+
+Direct observation of certain aspects of trawl behavior, such as trawl asymmetry measures, variations of trawl speed during trawling, bottom contact of the footrope, and catchability of the trawl on different bottom types for different snow crab sizes would yield key insights into trawl catchability and how to standardize our catches, perhaps even retrospectively.
+
+However, not having these data, we rather have recourse to indirect methods, relying rather on modelling the population dynamics of snow crab and seeing whether catchability can be estimated from temporal discrepancies in the natural dynamics of the stock.
+
+Though less involved, trends in certain other indicator species were also observed for discrepancies to see whether they also suggested changes in catchability in 2019.
+
+## Conclusions:
+
+- Detecting changes in catchability
+- Quantifying chnages in catchability.
+- The mechanisms underlying these changes in catcahbility remain largely unknown, as many aspects of trawling 
+  behaviour are unmonitored:
+   - Contact of the footrope beyond the central location of the tilt mechanism.
+   - Symmetry of the trawl
+   - Variations in trawl speed during trawling
+   - Efficiency of the trawl under various loadings 
+   - Accumulation of debris at the trawl mouth
+   - Variation in retention of small animals 
+   - Efficiency of the trawl on various bottom types.
+   
+The availability and variety of lower-cost devices, including undersea video, means that various aspects of these processes may be better informed in the future.
+
+In particular, 
+ - the attachment of an undersea camera on the headline is expected for the 2021 or 2022 survey.
+ - depth probes attached to doors will show when the doors a in contact with the bottom and the lifting og the doors during the latent phase is expected to significantly - the interplay between the lifting og the trawl doors and the trawl wings and footrope is expected to highly impact the efficiency of the trawl during the latent phase and may explain the seemingly insignificant impact of the latent swept area on resulting catches.
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
