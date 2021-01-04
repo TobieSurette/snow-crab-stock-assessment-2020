@@ -1,13 +1,15 @@
 library(gulf.data)
 library(gulf.graphics)
 
+output <- "pdf"
 years <- 2010:2020
-species <- "plaice"
-xlim <- c(0, 45)
-ylim = c(0, 50)
-by <- 10
+species <- "cod"
+xlim <- c(0, 80)
+ylim = c(0, 10)
+by <- 2
 
 clg()
+if (length(output) > 0) gdevice(output, paste0(species(species(species[1])[1]), ".", min(years), "-", max(years)))
 m <- kronecker(matrix(1:(2*round(length(years) / 2)),ncol = 2), matrix(1, nrow = 5, ncol = 5))
 m <- rbind(0, cbind(0, m, 0), 0, 0)
 layout(m)
@@ -53,7 +55,7 @@ for (i in 1:length(years)){
 
    if (i %in% c(6, 11)) mtext("Length(cm)", 1, 2.5, cex = 1.25)
 }
-
+if (length(output) > 0) dev.off()
 
 
 
