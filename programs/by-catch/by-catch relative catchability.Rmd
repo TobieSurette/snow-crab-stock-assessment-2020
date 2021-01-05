@@ -57,7 +57,6 @@ therefore probably represent minimum the trawlable abundance and biomass estimat
 
 ## Management Implications
 
-
 Snow crab is managed on a quota which is set according to a sliding scale of the survey biomass estimate.
 What are the implications of the increased survey catchability of 2019 and 2020?
 
@@ -70,13 +69,29 @@ rate
 
 # Lines of inference
 
-- Indirect lines ofinference for catchability are more uncertain than direct lines.
-- As a method of cross-validation, inferences from other species caught in the survey were also examined to see if they show similar patterns to snow crab.
-
-Characteristics of a good selectivity indicator.
+## Characteristics of a good selectivity indicator
 - Slow dynamics
 - Widely distributed in similar areas to snow crab
 - Limited movement
+- Main dynamics other than selectivity are characterized.
+
+## Direct approaches to inferring relative catchability: 
+- 2019 snow crab survey catchability experiment.
+
+## Indirect approaches to inferring relative catchability: 
+- Alternate station cross-validation analysis.
+- Snow crab survey by catch trends, plus global and local year to year catch ratios for indicator species.
+- Female snow crab population model.
+- Male snow crab population model.
+
+
+- Indirect lines of inference for catchability are more uncertain than direct lines.
+- As a method of cross-validation, inferences from other species caught in the survey were also examined to see if
+  they show similar patterns to snow crab.
+- Cross-validation from removal of alternatee stations from year-to-year.
+- Consideration of by-catch bi-annual trends.
+
+
 
 ## Evolution of Spatial Sampling
 
