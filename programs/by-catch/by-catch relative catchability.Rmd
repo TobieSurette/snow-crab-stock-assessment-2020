@@ -5,6 +5,38 @@ date: "31/12/2020"
 output: pdf_document
 ---
 
+# Presentation Plan
+- Historical summary of survey station relocations
+- Presentation of 2018-2019 survey catch scaling issue.
+- Passive trawling phase and 2020 remediation. 
+- Catchability inference
+   - 2019 Comparative catch experiment summary.
+   - Changes observed in survey by-catches.
+   - Snow crab population models.
+
+# Lines of inference
+
+## Characteristics of a good selectivity indicator
+- Slow dynamics
+- Widely distributed in similar areas to snow crab
+- Limited movement
+- Main dynamics other than selectivity are characterized.
+
+## Direct approaches to inferring relative catchability: 
+- 2019 snow crab survey catchability experiment.
+
+## Indirect approaches to inferring relative catchability: 
+- Alternate station cross-validation analysis.
+- Snow crab survey by catch trends, plus global and local year to year catch ratios for indicator species.
+- Female snow crab population model.
+- Male snow crab population model.
+
+- Indirect lines of inference for catchability are more uncertain than direct lines.
+- As a method of cross-validation, inferences from other species caught in the survey were also examined to see if
+  they show similar patterns to snow crab.
+- Cross-validation from removal of alternatee stations from year-to-year.
+- Consideration of by-catch bi-annual trends.
+
 # Emphasize the quality of the data set
 
 - Without such quality data, leading to low variability and its ability to track cohorts, we would not be able to make these inferences
@@ -66,31 +98,6 @@ This implies that years immediately prior to 2019 are *underestimated* with resp
 rate 
 
 - that for the recent time series, the true exploitation rate was lower than the reference exploitation rate, as prescribed by the harvest control rule.
-
-# Lines of inference
-
-## Characteristics of a good selectivity indicator
-- Slow dynamics
-- Widely distributed in similar areas to snow crab
-- Limited movement
-- Main dynamics other than selectivity are characterized.
-
-## Direct approaches to inferring relative catchability: 
-- 2019 snow crab survey catchability experiment.
-
-## Indirect approaches to inferring relative catchability: 
-- Alternate station cross-validation analysis.
-- Snow crab survey by catch trends, plus global and local year to year catch ratios for indicator species.
-- Female snow crab population model.
-- Male snow crab population model.
-
-
-- Indirect lines of inference for catchability are more uncertain than direct lines.
-- As a method of cross-validation, inferences from other species caught in the survey were also examined to see if
-  they show similar patterns to snow crab.
-- Cross-validation from removal of alternatee stations from year-to-year.
-- Consideration of by-catch bi-annual trends.
-
 
 
 ## Evolution of Spatial Sampling
