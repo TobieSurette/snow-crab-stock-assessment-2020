@@ -32,19 +32,21 @@ for (i in 1:length(years)){
    if (i %in% 1:2) axis(2)
    if (i %in% c(2,4)) axis(1)
 
-   for (j in 1:nrow(s)){
+   for (j in 276:nrow(s)){
       print(j)
-      e <- read.esonar(s[j, ], source = "ascii")
+      e <- read.esonar(s[j, ])
       if (length(e) > 0){
          e <- trim(e, range = c(time(s[j, ], "touchdown"), time(s[j, ], "liftoff")))
-         y <- 1000*deg2km(lon(e), lat(e))
-         y[,1] <- y[,1] - y[1,1]
-         y[,2] <- y[,2] - y[1,2]
-         t <- time2min(time(e), time(s[j, ], "touchdown"))
-         stop <- time2min(time(s[j, ], "stop"), time(s[j, ], "touchdown"))
-         index <- t <= stop
-         lines(y[index,1], y[index,2], col = "grey")
-         lines(y[!index,1], y[!index,2], col = "red")
+         if (nrow(e) > 0){
+            y <- 1000*deg2km(lon(e), lat(e))
+            y[,1] <- y[,1] - y[1,1]
+            y[,2] <- y[,2] - y[1,2]
+            t <- time2min(time(e), time(s[j, ], "touchdown"))
+            stop <- time2min(time(s[j, ], "stop"), time(s[j, ], "touchdown"))
+            index <- t <= stop
+            lines(y[index,1], y[index,2], col = "grey")
+            lines(y[!index,1], y[!index,2], col = "red")
+         }
       }
    }
    points(0, 0, pch = 21, bg = "grey50")
