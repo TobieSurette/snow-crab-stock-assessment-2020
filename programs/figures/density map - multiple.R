@@ -1,48 +1,62 @@
-library(gulf)
+library(gulf.data)
+library(gulf.stats)
+library(gulf.graphics)
+library(gulf.spatial)
 
-source("C:/gulf package/gulf/R/summary.scset.R")
-source("C:/gulf package/gulf/R/ked.scset.R")
+# Load kriging polygons:
+p <- read.gulf.spatial("kriging polygons revised")["gulf"]
 
-load("C:/gulf package/gulf/data/kriging.polygons.revised.rda")
-p <- kriging.polygons
-p <- p["gulf"]
-
-var <- "COM" # "MIGE56" #"COMSC345" # "MIGE56" 
-output <- "pdf", # jpeg <- TRUE
+var <- "MIGE56" # "COM" # "MIGE56" #"COMSC345" #
+output <- "pdf" # jpeg <- TRUE
+weight <- FALSE
 
 # Uncorrected variables:
 res <- list()
 m <- list()
-years <- 2019:2019
+years <- 2010:2020
 for (i in 1:length(years)){
-   # Perform kriging with external drift using three-year variogram averaging:
-   if ((var == "COM") | ((var == "COMSC345") & (years[i] != 2018))){
-      m[[i]] <- ked.scset(year = years[i], variables = var, grid = c(100, 100), weight = TRUE, hard.shelled = TRUE, variogram.average = 3, units = "t", bug = FALSE)
-   }
-   if (var == "MIGE56") m[[i]] <- ked.scset(year = years[i], variables = var, grid = c(100, 100), variogram.average = 3, bug = FALSE)
-   if ((var == "COMSC345") & (years[i] == 2018)){
-      # Shell condition 2 corrective probabilities by survey week for 2018:
-      pnew <- c(0.33, 0.20, 0.02, 0.04, 0.02, 0.11, 0.40, 0.04, 0.60)
-      names(pnew) <- 1:length(pnew)
+   print(years[i])
+   # Read three years of data (for variogram averaging):
+   s <- read.scsset(year = (years[i]-2):years[i], survey = "regular", valid = 1) # Tow data.
+   b <- read.scsbio(year = (years[i]-2):years[i], survey = "regular")            # Biological data.
+   b$tow.id <- tow.id(b)
 
-      s <- read.scset(year = 2018, valid = 1)
-      s$week <- week(date(s))
-      s$week <- s$week - min(s$week) + 1
+   # Import catch data:
+   import(s, fill = 0) <- catch(b, category = var, weight = weight, as.hard.shelled = TRUE, units = "t") # Merge catches.
+   s[var] <- 1000000 * s[var] / repvec(s$swept.area, ncol = length(var))   # Convert to tonnes per km2.
 
-      s <- summary(s, category = c("COMSC2", "COMSC345"), weight = TRUE, hard.shelled = TRUE, units = "t")
-      s$COMSC345 <- s$COMSC345 + s$COMSC2 * (1-pnew[s$week]) 
-      s$COMSC345 <- 1000000 * s$COMSC345 / s$swept.area
+   m[[i]] <- ked(s, variables = var, variogram.average = 3)
 
-      # Add 2016 and 2017 for variogram averaging:
-      ss <- read.scset(year = 2016:2017, valid = 1)
-      ss <- summary(ss, category = c("COMSC345"), weight = TRUE, hard.shelled = TRUE, units = "t")
-      ss$COMSC345 <- 1000000 * ss$COMSC345 / s$swept.area
-      s <- rbind(ss, s[names(ss)])
+  # # Perform kriging with external drift using three-year variogram averaging:
+#   if ((var == "COM") | ((var == "COMSC345") & (years[i] != 2018))){
+#      m[[i]] <- ked.scset(year = years[i], variables = var,  weight = weight, as.hard.shelled = TRUE, variogram.average = 3, units = "t")
+#      m <- ked(s, variables = categories, variogram.average = 3, lag = 3, max.distance = 75)
+#   }
 
-      m[[i]] <- ked.scset(s, variables = "COMSC345", variogram.average = 3, grid = c(100, 100), bug = FALSE, max.distance = 150)
-   }
-      
-   res[[i]] <- summary.ked(m[[i]], polygon = p)
+ #  if (var == "MIGE56") m[[i]] <- ked(year = years[i], variables = var, variogram.average = 3, weight = weight)
+ #  if ((var == "COMSC345") & (years[i] == 2018)){
+ #     # Shell condition 2 corrective probabilities by survey week for 2018:
+ #     pnew <- c(0.33, 0.20, 0.02, 0.04, 0.02, 0.11, 0.40, 0.04, 0.60)
+ #     names(pnew) <- 1:length(pnew)#
+ #
+ #     s <- read.scset(year = 2018, valid = 1)
+ #     s$week <- week(date(s))
+ #     s$week <- s$week - min(s$week) + 1
+ #
+ #     s <- summary(s, category = c("COMSC2", "COMSC345"), weight = weight, as.hard.shelled = TRUE, units = "t")
+ #      s$COMSC345 <- s$COMSC345 + s$COMSC2 * (1-pnew[s$week])
+ #     s$COMSC345 <- 1000000 * s$COMSC345 / s$swept.area
+
+  #    # Add 2016 and 2017 for variogram averaging:
+#      ss <- read.scset(year = 2016:2017, valid = 1)
+ #     ss <- summary(ss, category = c("COMSC345"), weight = weight, as.hard.shelled = TRUE, units = "t")
+ #     ss$COMSC345 <- 1000000 * ss$COMSC345 / s$swept.area
+ #     s <- rbind(ss, s[names(ss)])
+ #
+ #     m[[i]] <- ked.scset(s, variables = "COMSC345", variogram.average = 3, grid = c(100, 100), bug = FALSE, max.distance = 150)
+ #  }
+
+   res[[i]] <- summary(m[[i]], polygon = p)
 }
 names(res) <- years
 
@@ -50,46 +64,37 @@ names(res) <- years
 library(akima)
 
 # Prepare plot:
+gdevice(output, file = paste0("density.map.", var, ".", years[1], "-", years[length(years)]), height = 9, width = 7.5)
 k <- kronecker(matrix(1:12, ncol = 3, byrow = TRUE), matrix(1, nrow = 3, ncol = 5))
-#k <- kronecker(matrix(1:9, ncol = 3, byrow = TRUE), matrix(1, nrow = 3, ncol = 5))
 k <- rbind(0, cbind(0, k, 0), 0)
-
-if (output == "pdf") pdf(file = paste0("U:/Snow Crab/Stock Assessment 2019/Density Map ", var, " ", str, ".pdf"), width = 11, height = 8.5)
-
-if (output %in% c("jpg", "jpeg")){
-   if (length(years) == 1) str <- years else str <-  paste0(min(years), "-", max(years))
-   jpeg(file = paste0("U:/Snow Crab/Stock Assessment 2019/Density Map ", var, " ", str, ".jpg"), width = 7 * 480, height = 7 * 480, res = 7 * 75)
-}
-          
-if (is.null(dev.list())) windows(height = 9, width = 7.5)
-
 layout(k)
 par(mar = c(0, 0, 0, 0))
-for (i in 1:11){
-   if (i %in% c(1)) axis.side <- c(2,3)
-   if (i %in% c(10)) axis.side <- c(1,2)
-   if (i %in% c(11)) axis.side <- c(1)
+for (i in 1:length(years)){
+   if (i %in% c(1))   axis.side <- c(2,3)
+   if (i %in% c(10))  axis.side <- c(1,2)
+   if (i %in% c(11))  axis.side <- c(1)
    if (i %in% c(4,7)) axis.side <- c(2)
-   if (i %in% c(2)) axis.side <- c(3)
-   if (i %in% c(3)) axis.side <- c(3,4)
+   if (i %in% c(2))   axis.side <- c(3)
+   if (i %in% c(3))   axis.side <- c(3,4)
    if (i %in% c(5,8)) axis.side <- NULL
    if (i %in% c(6,9)) axis.side <- c(4)
-   
-   gulf.map(land = FALSE, xlim = c(-66, -60), ylim = c(45.6, 49.1), axis.side = axis.side)
-   # gulf.map(land = FALSE, xlim = c(-66, -60), ylim = c(45.6, 49.1))
-   
+
+   # Background map:
+   map.new(xlim = c(-66.5, -60-1/6), ylim = c(45.5, 49+1/6))
+   map("coast")
+
    mu <- m[[i]]$map[,,1]
-   lon <- m[[i]]$map.longitude 
+   lon <- m[[i]]$map.longitude
    lat <- m[[i]]$map.latitude
-   index <- !is.na(lon) & !is.na(lat) & !is.na(mu) 
+   index <- !is.na(lon) & !is.na(lat) & !is.na(mu)
    mu <- mu[index]
    lon <- lon[index]
    lat <- lat[index]
-   
+
    xx <- seq(-66.5, -60, len = 400)
-   yy <- seq(45, 49, len = 400)    
+   yy <- seq(45, 49, len = 400)
    zz <- interp(x = lon, y = lat, z = mu, xo = xx, yo = yy,  linear = TRUE, extrap = TRUE, duplicate = "mean")$z
-   
+
    xxx <- repvec(xx, nrow = length(yy))
    yyy <- repvec(yy, ncol = ncol(xxx))
    xxx <- t(xxx)
@@ -97,11 +102,11 @@ for (i in 1:11){
    index <- in.polygon(as.polygon(p$gulf$longitude, p$gulf$latitude), xxx, yyy)
    dim(index) <- dim(zz)
    zz[!index] <- NA
-   
+
    cols <- colorRampPalette(c("blue4", "blue", "mediumturquoise", "yellow", "orange", "red", "darkred"))
 
    #image(xx, yy, 1000 * zz, add = TRUE, col = cols(100), breaks = c(seq(0, 3000, len = 100), 10000))
-   
+
    if (var == "COM"){
       breaks = c(seq(0, 3000, by = 300), 10000)
       zz <- 1000 * zz
@@ -113,26 +118,21 @@ for (i in 1:11){
    if (var == "MIGE56"){
       breaks = c(seq(0, 15000, by = 1500), 100000)
    }
-   
+
    image(xx, yy, zz, add = TRUE, col = cols(length(breaks)-1), breaks = breaks)
-   #contour(xx, yy, 1000 * zz, add = TRUE, levels = c(seq(0, 3000, by = 300), 10000), labels = "")
-   #filled.contour(xx, yy, 1000 * zz, add = TRUE, levels = c(seq(0, 3000, by = 300), 10000))
 
-   #wind.rose()
+   # Fishing zones:
+   v <- read.gulf.spatial("fishing zone vertices shp", species = 2526, region = "gulf", label = c("12", "12E", "12F", "19"))
+   v <- subset(v, label %in% c("12", "12E", "12F", "19"))
+   plot(v, add = TRUE)
 
-   map.fishing.zones(species = 2526, lwd = 1)
-   coastline(col = "grey80", border = "grey40", lwd = 1)
+   lines(p[[1]]$longitude, p[[1]]$latitude, lwd = 0.5)
+
+   text(-61, 48.7, years[i], cex = 1.4)
+
+   if (length(axis.side) > 0) map.axis(axis.side)
+
    box(lwd = 1)
-       
-   # Display cross-validated residuals:
-   #r <- m[[i]]$data[, m[[i]]$variables[1]] - m[[i]]$cross.validation[, 1]
-   #index <- r >=0
-   #points(longitude.scset(m[[i]]$data)[index], latitude.scset(m[[i]]$data)[index], cex = 0.05 * sqrt(1000*r[index]), col = "red", lwd = 2)
-   #points(longitude.scset(m[[i]]$data)[!index], latitude.scset(m[[i]]$data)[!index], cex = 0.05 * sqrt(-1000*r[!index]), col = "black", lwd = 2)
-    
-   for (j in 1:1) lines(p[[j]]$longitude, p[[j]]$latitude)  
-   
-   text(-61, 48.7, years[i], cex = 1.4)   
 }
 
 #colors <- colorRampPalette(c("blue", "yellow", "orange", "red", "darkred"))
@@ -140,34 +140,13 @@ str <- paste0(breaks[1:(length(breaks)-1)], " - ", breaks[2:length(breaks)])
 str[length(str)] <- paste(breaks[length(breaks)-1], "+")
 
 plot(c(0, 1), c(0, 1), type = "n", axes = FALSE, xlab = "", ylab = "")
-a <- legend("center", 
+legend("center",
        legend = rev(str),
        pt.bg = rev(cols(length(breaks))),
        pch = 22,
        pt.cex = 3,
-       cex = 0.95, bty = "n", plot = FALSE)
-legend("center", 
-       legend = rev(str),
-       pt.bg = rev(cols(length(breaks))),
-       pch = 22,
-       pt.cex = 3,
-       cex = 0.95, bty = "n")       
+       cex = 0.95,
+       bty = "n",
+       title = ifelse(weight, "kg / km2", "# / km2"))
 
-str <- paste0(breaks[1:(length(breaks)-1)], " - ", breaks[2:length(breaks)])
-str[length(str)] <- paste(breaks[length(breaks)-1], "+")
-      
-legend("bottomleft", 
-       legend = rev(str),
-       pt.bg = rev(cols(length(breaks))),
-       pch = 22,
-       pt.cex = 2.6,
-       cex = 0.85,  bg = "white", title = "n / km2") 
-       
-
-#points(a$rect$left + 0.5 * a$rect$w, a$rect$top - a$rect$h)
-str <- "# / km2"
-if (var %in% c("COM", "COMSC345")) str <- "kg / km2"
-text(a$rect$left + 0.5 * a$rect$w, a$rect$top - a$rect$h + 0.04, str, pos = 1, cex = 1.25)        
-
-if (jpeg) dev.off()
- 
+dev.off()

@@ -3,20 +3,16 @@ library(gulf.graphics)
 library(gulf.spatial)
 
 # Load survey data:
+language <- language("fr")
+output <- "pdf"
 years <- 2005:2020
-sex <- 2
+sex <- 1
 if (sex == 1) file <- "males" else file <- "females"
 survey <- "regular"
-jpeg <- TRUE
-language <- "english"
 disaggregate <- FALSE  # Whether to disaggregate early survey by sampling grid.
 
-if (jpeg){
-   file <- paste0("results/figures/size-frequency/", "size-frequency ", file, " ", min(years),"-", max(years), " - ", language, ".jpg")
-   jpeg(file = file, width = 11 * 480, height = 8.5 * 480, res = 8.5 * 75)
-}else{
-   dev.new(height = 8.5, width = 11)
-}
+file <- paste0("size-frequency.", file, ".", min(years),"-", max(years))
+gdevice(output, file = file, height = 8.5, width = 11)
 
 m <- kronecker(matrix(1:16, ncol = 4), matrix(1, ncol = 3, nrow = 3))
 m <- rbind(0, cbind(0, 0, m, 0), 0, 0)
@@ -72,7 +68,7 @@ for (i in 1:length(years)){
    plot(xlim, ylim, type = "n", xaxs = "i", yaxs = "i", xaxt = "n", xlab = "", yaxt = "n", ylab = "")
    grid()
 
-   gbarplot(res, width = 1, col = c("black", "grey90"), add = TRUE, legend = FALSE, lwd = 0.5, border = c("black", "grey65"))
+   gbarplot(res, width = 1, col = c("grey30", "grey90"), add = TRUE, legend = FALSE, lwd = 0.5, border = c("grey30", "grey65"))
 
    if (sex == 1) lines(c(95, 95), par("usr")[3:4], lwd = 1, col = "brown3", lty = "dashed")
 
@@ -103,5 +99,5 @@ for (i in 1:length(years)){
    box()
 }
 
-if (jpeg) dev.off()
+dev.off()
 

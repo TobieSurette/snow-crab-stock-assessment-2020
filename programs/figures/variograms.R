@@ -1,5 +1,6 @@
 library(gulf.data)
 library(gulf.stats)
+library(gulf.graphics)
 library(gulf.spatial)
 
 # Define years:
@@ -12,7 +13,7 @@ for (i in 1:length(years)){
    s <- read.scsset(year = years[i], survey = "regular", valid = 1) # Set data.
    b <- read.scsbio(year = years[i], survey = "regular", valid = 1) # Biological data.
    b$tow.id <- tow.id(b)
-   import(s, fill = 0) <- catch(b, category = category, weight = TRUE, hard.shelled = TRUE, units = "kg")
+   import(s, fill = 0) <- catch(b, category = category, weight = TRUE, as.hard.shelled = TRUE, units = "kg")
    s[category] <- 1000000 * s[category] / repvec(s$swept.area, ncol = length(category))
 
    # Fit variogram:
@@ -64,7 +65,8 @@ for (i in 3:length(v)){
 }
 
 # Plot three-year variograms:
-dev.new(width = 8.5, height = 10)
+#dev.new(width = 8.5, height = 10)
+gdevice("pdf", width = 8.5, height = 10, file = paste0("variograms.three-year.", years[3], "-", years[length(years)]))
 if (length(w) %% 2 == 0) n <- length(w) / 2 else n <- (length(w)+1) / 2
 m <- cbind(outer(rep(1:n, each = 3), rep(1, 4)), 0, outer(rep((n+1):(2*n), each = 3), rep(1, 4)))
 m <- rbind(0, cbind(0, m, 0), 0)
@@ -72,7 +74,8 @@ layout(m)
 
 for (i in 1:length(w)){
    par(mar = c(0, 0, 0, 0))
-   plot(w[[i]], xaxt = "n", xlab = "", ylab = "", yaxt = "n", scale = 10^6, ylim = c(0, 1.3 * max(w[[i]]$empirical$semi.variance)/1000000), show.nugget = FALSE, show.sill = FALSE)
+   plot(w[[i]], xaxt = "n", xlab = "", ylab = "", yaxt = "n", scale = 10^6,
+        ylim = c(0, 1.3 * max(w[[i]]$empirical$semi.variance)/1000000), show.nugget = FALSE, show.sill = FALSE)
    axis(2, at = , labels = )
    if (i %in% c(n, 2*n)) axis(1, cex.axis = 1.25)
    text(mean(par("usr")[1:2]), par("usr")[3] + 0.94 * diff(par("usr")[3:4]), years[i+2], cex = 1.5, font = 2)
@@ -80,4 +83,5 @@ for (i in 1:length(w)){
    if (i == round((n+0.01)/2)) mtext("Semi-variance", 2, 2.5, cex = 1.5, at = mean(par("usr")[3:4]))
 }
 mtext("Distance (km)", 1, 3.0, at = -10, cex = 1.5)
+dev.off()
 
