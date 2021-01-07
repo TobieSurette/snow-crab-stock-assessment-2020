@@ -5,7 +5,7 @@ library(gulf.graphics)
 years <- 2017:2020
 output = "pdf"
 reference <- "end.time"
-language <- language("en")
+language <- language("fr")
 
 clg()
 gdevice(output, file = paste0("results/figures/", language, "/passive.duration.", min(years), "-", max(years)))
