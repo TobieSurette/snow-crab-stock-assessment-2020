@@ -19,7 +19,6 @@ for (year in years){
    y <- read.scscat(year:(year+1), species = species, survey = "regular")
    x <- read.scsset(year:(year+1), valid = 1, survey = "regular")
    y <- aggregate(y[c("number.caught", "weight.caught")], by = y[c("date", "tow.number", "tow.id")], sum)
-
    import(x, fill = 0, var = var) <- y
 
    if (var == "weight.caught"){
@@ -37,7 +36,7 @@ for (year in years){
    xx <- x[ix, ]
    r[as.numeric(substr(xx$tow.id, 3, 5)), 2] <- xx$density
 
-   ix <- !is.na(r[,1]) & !is.na(r[,2]) & r[,1] > 0 & r[,2] > 0
+   ix <- !is.na(r[,1]) & !is.na(r[,2]) & (r[,1] > 0) & (r[,2] > 0)
    r <- r[ix, ]
    lr1 <- log(r[,1])
    lr2 <- log(r[,2])
