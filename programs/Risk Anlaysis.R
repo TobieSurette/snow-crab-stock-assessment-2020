@@ -15,17 +15,6 @@ pbias <- 0.00   # Bias to add into analysis
 BMMGE95.2020.mu <- (1-pbias) * 77748.1       # Estimated commercial biomass
 BMMGE95.2020.sigma <- (1-pbias) * 5397.4
 
-
-#bias  mu.rec sigma.rec
-#0    66.79	  12.91
-#5    63.82	  12.07
-#7    62.84   12.06
-#10   61.16	  11.69
-#15   58.41	  11.0
-#20   55.87	  10.46
-#25   53.2	  10.01
-#30   50.84	   9.693
-
 BREC.2021.mu    <- 81250         # Projected recruitment R-1 from the Bayesian model.
 BREC.2021.sigma <- 16020
 ER <- TAC / BMMGE95.2020.mu
@@ -84,7 +73,7 @@ S.sim <- apply(survivorship[, (ncol(survivorship)-4):ncol(survivorship)], 1, mea
 S <- mean(S.sim)
 
 # Simulate biomass for 2020:
-BMMGE95.2020 <- rnorm(n, BMMGE95.2020.mu, BMMGE95.2020.mu)
+BMMGE95.2020 <- rnorm(n, BMMGE95.2020.mu, BMMGE95.2020.sigma)
 
 # Define vector of catch options:
 
@@ -173,12 +162,3 @@ tab <- rbind(tab, ref.tab)
 values <- sort(c(seq(20000, 50000, by = 1000), ref.tab$catch))
 index <- match(values, tab$catch)
 tab[index, ]
-
-
-
-
-
-
-
-
-
