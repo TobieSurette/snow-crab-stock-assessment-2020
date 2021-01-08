@@ -1,20 +1,14 @@
 # Converted risk analysis program (from Analytica)
 
-language <- language("en")
-
 # Define constants and
 Brecov <- 9970  # Recovery biomass.
-Busr   <- 41371 # Upper stock reference biomass.
-#ER <- 0.406    # Exploitation rate for this year.
-n <- 50000      # Number of random samples.
-TAC <- 31410
-pbias <- 0.00   # Bias to add into analysis
-
-# BMMGE95.2019.mu <- (1-pbias) * 79065.50       # Estimated commercial biomass
-# BMMGE95.2019.sigma <- (1-pbias) * 5364.855
-BMMGE95.2020.mu <- (1-pbias) * 77748.1       # Estimated commercial biomass
-BMMGE95.2020.sigma <- (1-pbias) * 5397.4
-
+Busr   <- 41371   # Upper stock reference biomass.
+#ER <- 0.406     # Exploitation rate for this year.
+n      <- 50000      # Number of random samples.
+TAC <- 32100.59
+pbias <- 0.30
+BMMGE95.2019.mu <- (1-pbias) * 79065.50       # Estimated biomass
+BMMGE95.2019.sigma <- (1-pbias) * 5364.855
 
 #bias  mu.rec sigma.rec
 #0    66.79	  12.91
@@ -25,10 +19,9 @@ BMMGE95.2020.sigma <- (1-pbias) * 5397.4
 #20   55.87	  10.46
 #25   53.2	  10.01
 #30   50.84	   9.693
-
-BREC.2021.mu    <- 81250         # Projected recruitment R-1 from the Bayesian model.
-BREC.2021.sigma <- 16020
-ER <- TAC / BMMGE95.2020.mu
+BREC.2020.mu <- 66790          # Projected recruitment R-1 from the Bayesian model.
+BREC.2020.sigma <- 12910
+ER <- TAC / BMMGE95.2019.mu
 quota <- TAC
 
 # Reparameterize log-normal distribution:
@@ -50,18 +43,16 @@ rlnorm <- function(n, mu, sigma){
 #2  COMSC12    gulf 57842.85    59982.09  99286.08      352 58995.30 4760.665 50214.73 68862.82 -0.015845260 0.8995601 1.579778
 #3 COMSC345    gulf 57842.85    21025.01  39789.18      352 20290.99 1830.448 16939.94 24108.74 -0.000148860 0.3171853 0.549708
 
-# Landings and biomass stats:
-# Warning! Landings and residual biomass estimates have the same year, but total biomass is offset by one year
-data <- data.frame(year = 1997:2020,
-                   landings = c(17.66, 13.86, 15.52, 19.18, 18.51, 26.18, 21.16, 31.66, 36.08, 29.12, 26.87, 24.46, 23.64, 9.549, 10.71, 21.96, 26.05, 24.44, 25.91, 21.71, 43.656, 24.260, 31.707, 28.045),
+data <- data.frame(year = 1997:2019,
+                   landings = c(17.66, 13.86, 15.52, 19.18, 18.51, 26.18, 21.16, 31.66, 36.08, 29.12, 26.87, 24.46, 23.64, 9.549, 10.71, 21.96, 26.05, 24.44, 25.91, 21.71, 43.656, 24.260, 31.707),
                    MMGE95SC345.mu = c(27.6882, 28.2949, 31.1769, 9.9793, 17.6121, 13.0600, 26.9933, 21.2590, 23.4963, 19.6210, 26.8285, 20.9811, 10.4538, 15.4901, 33.6790,
-                                      25.6145, 27.0918, 23.8632, 24.1063, 24.3094, 14.6504, 21.4315, 20.291, 19.1073),
+                                      25.6145, 27.0918, 23.8632, 24.1063, 24.3094, 14.6504, 21.4315, 20.291),
                    MMGE95SC345.sigma = c(3.1779, 3.8521, 3.4005, 1.751, 2.1014, 1.2433, 2.6788, 2.1584, 2.5455, 1.5852, 1.937, 1.6179, 0.9669, 1.3447, 2.8553, 2.1802, 2.7868,
-                                       1.9003, 2.078, 1.855, 1.3788, 2.3042, 1.830, 1.5582),
+                                         1.9003, 2.078, 1.855, 1.3788, 2.3042, 1.830),
                    MMGE95.mu = c(64.5184, 64.5184, 57.8125, 56.7565, 50.621, 60.3283, 79.2275, 84.4475, 103.1457, 82.5652, 73.6453, 66.3714, 52.9209, 31.0153, 35.9294,
-                                 62.8407, 74.7775, 66.709, 67.9896, 58.9269, 98.3942, 65.7376, 80.746, 79.06550),
+                                 62.8407, 74.7775, 66.709, 67.9896, 58.9269, 98.3942, 65.7376, 80.746),
                    MMGE95.sigma = c(5.6785, 5.6785, 6.6617, 4.9687, 4.8133, 5.7457, 6.0774, 5.8931, 5.699, 4.8234, 4.2417, 3.3922, 3.0653, 1.8656, 2.0665, 3.6529, 5.3264, 6.8484,
-                                    4.3836, 4.0608, 6.0042, 4.578, 5.302936, 5.364855))
+                                    4.3836, 4.0608, 6.0042, 4.578, 5.302936))
 
 # Calculate survivorship rate:
 MMGE95SC345 <- matrix(NA, nrow = n, ncol = nrow(data))
@@ -75,16 +66,21 @@ for (i in 1:n){
       survivorship[i,j] <- (data$landings[j] + MMGE95SC345[i,j]) / MMGE95[i,j]
    }
 }
-colnames(MMGE95SC345)  <- data$year
-colnames(MMGE95)       <- data$year
+colnames(MMGE95SC345) <- data$year
+colnames(MMGE95) <- data$year
 colnames(survivorship) <- data$year
 
 # 5-year survivorship value:
 S.sim <- apply(survivorship[, (ncol(survivorship)-4):ncol(survivorship)], 1, mean)
 S <- mean(S.sim)
 
-# Simulate biomass for 2020:
-BMMGE95.2020 <- rnorm(n, BMMGE95.2020.mu, BMMGE95.2020.mu)
+# Simulate biomass for 2017:
+#BMMGE95.2017.mu <- 66021.4
+#BMMGE95.2017.sigma <- 4737
+#BMMGE95.2017 <- rnorm(n, BMMGE95.2017.mu, BMMGE95.2017.sigma)
+
+# Simulate biomass for 2019:
+BMMGE95.2019 <- rnorm(n, BMMGE95.2019.mu, BMMGE95.2019.sigma)
 
 # Define vector of catch options:
 
@@ -92,25 +88,36 @@ BMMGE95.2020 <- rnorm(n, BMMGE95.2020.mu, BMMGE95.2020.mu)
 catch <- c(seq(18, 100, by = 0.25) * 1000 , quota, 44800, 72440)
 catch <- c(catch[catch < quota], quota, catch[catch >= quota])
 
-# Calculate remaining biomass for 2021:
-BREM.2021 <- repvec(BMMGE95.2020 * S, ncol = length(catch)) - repvec(catch, nrow = n)
+# Calculate remaining biomass for 2018:
+#BREM.2018 <- repvec(BMMGE95.2017 * S, ncol = length(catch)) - repvec(catch, nrow = n)
+
+# Calculate remaining biomass for 2019:
+BREM.2020 <- repvec(BMMGE95.2019 * S, ncol = length(catch)) - repvec(catch, nrow = n)
 
 # Probability of remaining biomass being below Blim in 2020:
-Plim <- apply(BREM.2021 < Brecov, 2, function(x) sum(x) / length(x))
+Plim <- apply(BREM.2020 < Brecov, 2, function(x) sum(x) / length(x))
 names(Plim) <- catch
 plot(catch, Plim)
 
 # Probability of exceeding ER in 2019:
-ER.2021 <- repvec(catch, nrow = n) / repvec(BMMGE95.2020, ncol = length(catch))  # Calculate simulated exploitation rates:
-PER <- apply(ER.2021 > ER, 2, function(x) sum(x) / length(x))
+ER.2020 <- repvec(catch, nrow = n) / repvec(BMMGE95.2019, ncol = length(catch))  # Calculate simulated exploitation rates:
+PER <- apply(ER.2020 > ER, 2, function(x) sum(x) / length(x))
 names(PER) <- catch
 plot(catch, PER)
 
-# R-1 2021 mu and sigma:
-BREC.2021 <- rnorm(n, BREC.2021.mu, BREC.2021.sigma)
+# Here
+
+# R-1 2018 mu and sigma:
+#BREC.2018.mu <- 51262
+#BREC.2018.sigma <- 4127.5
+#BREC.2018 <- rnorm(n, BREC.2018.mu, BREC.2018.sigma)
+
+# R-1 2020 mu and sigma:
+BREC.2020 <- rnorm(n, BREC.2020.mu, BREC.2020.sigma)
+
 
 # Probability of exceeding Busr in 2019:
-Pusr <- apply((BREC.2021 + BREM.2021) < Busr, 2, function(x) sum(x) / length(x))
+Pusr <- apply((BREC.2020 + BREM.2020) < Busr, 2, function(x) sum(x) / length(x))
 names(Pusr) <- catch
 plot(catch, Pusr)
 
@@ -119,15 +126,16 @@ tab <- data.frame(catch = catch,
                   P.lim = Plim,
                   P.usr = Pusr,
                   P.ER = PER,
-                  mu = apply(BREC.2021 + BREM.2021, 2, mean),
-                  lci = apply(BREC.2021 + BREM.2021, 2, quantile, p = 0.025),
-                  uci = apply(BREC.2021 + BREM.2021, 2, quantile, p = 0.975))
+                  mu = apply(BREC.2020 + BREM.2020, 2, mean),
+                  lci = apply(BREC.2020 + BREM.2020, 2, quantile, p = 0.025),
+                  uci = apply(BREC.2020 + BREM.2020, 2, quantile, p = 0.975))
 
 rownames(tab) <- NULL
 
 ref.tab <- tab[(nrow(tab)-2):nrow(tab), ]
 tab <- tab[1:(nrow(tab)-3), ]
 
+language <- "french"
 # Probability of exceeding ER plot:
 if (language == "english"){
    ylab <- "Probability"
@@ -170,7 +178,7 @@ text(approx(tab$P.usr, tab$catch, 0.5)$y / 1000, 0.25, paste0("= ", round(approx
 
 # Build reduced table for export:
 tab <- rbind(tab, ref.tab)
-values <- sort(c(seq(20000, 50000, by = 1000), ref.tab$catch))
+values <- sort(c(seq(20000, 40000, by = 1000), ref.tab$catch))
 index <- match(values, tab$catch)
 tab[index, ]
 

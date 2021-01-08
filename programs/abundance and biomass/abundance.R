@@ -4,7 +4,7 @@ library(gulf.graphics)
 library(gulf.spatial)
 
 # Survey year:
-year <- 2020
+year <- 2019
 output <- "results/tables/"
 categories <- c("MIGE34L45",                                           # Instar VIII recruitment.
                 "MMGE95SC12", "MMGE95SC3", "MMGE95SC4", "MMGE95SC5",   # Commercial by shell condition.
@@ -29,7 +29,7 @@ s[categories] <- s[categories] / repvec(s$swept.area, ncol = length(categories))
 m <- ked(s, variables = categories, variogram.average = 3, lag = 3, max.distance = 75)
 
 # Calculate abundance:
-res <- summary.ked(m, polygon = p)
+res <- summary(m, polygon = p)
 
 # Add description:
 res <- cbind(res["variable"],
