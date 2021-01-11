@@ -15,8 +15,8 @@ pbias <- 0.00   # Bias to add into analysis
 BMMGE95.2020.mu <- (1-pbias) * 77748.1       # Estimated commercial biomass
 BMMGE95.2020.sigma <- (1-pbias) * 5397.4
 
-BREC.2021.mu    <- 81250         # Projected recruitment R-1 from the Bayesian model.
-BREC.2021.sigma <- 16020
+BREC.2021.mu    <- 79870         # Projected recruitment R-1 from the Bayesian model.
+BREC.2021.sigma <- 15980
 ER <- TAC / BMMGE95.2020.mu
 quota <- TAC
 
@@ -78,7 +78,7 @@ BMMGE95.2020 <- rnorm(n, BMMGE95.2020.mu, BMMGE95.2020.sigma)
 # Define vector of catch options:
 
 #catch <- c(seq(18, 80, by = 0.25) * 1000 , quota, 37058, 53859)
-catch <- c(seq(18, 100, by = 0.25) * 1000 , quota, 44800, 72440)
+catch <- c(seq(18, 120, by = 0.25) * 1000 , quota, 41731, 90233)
 catch <- c(catch[catch < quota], quota, catch[catch >= quota])
 
 # Calculate remaining biomass for 2021:
@@ -89,7 +89,7 @@ Plim <- apply(BREM.2021 < Brecov, 2, function(x) sum(x) / length(x))
 names(Plim) <- catch
 plot(catch, Plim)
 
-# Probability of exceeding ER in 2019:
+# Probability of exceeding ER in 2021:
 ER.2021 <- repvec(catch, nrow = n) / repvec(BMMGE95.2020, ncol = length(catch))  # Calculate simulated exploitation rates:
 PER <- apply(ER.2021 > ER, 2, function(x) sum(x) / length(x))
 names(PER) <- catch
@@ -159,6 +159,6 @@ text(approx(tab$P.usr, tab$catch, 0.5)$y / 1000, 0.25, paste0("= ", round(approx
 
 # Build reduced table for export:
 tab <- rbind(tab, ref.tab)
-values <- sort(c(seq(20000, 50000, by = 1000), ref.tab$catch))
+values <- sort(c(seq(20000, 120000, by = 1000), ref.tab$catch))
 index <- match(values, tab$catch)
 tab[index, ]

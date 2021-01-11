@@ -10,7 +10,7 @@ categories <- c("MIGE34L45",                                           # Instar 
                 "MMGE95SC12", "MMGE95SC3", "MMGE95SC4", "MMGE95SC5",   # Commercial by shell condition.
                 "MM", "MMGE95", "MML95",                               # Adult males.
                 "FI", "FIGNO", "FM", "FP", "FMULT",                    # Females.
-                "MIGE56L69", "MIGE69L83", "MIGE83", "MIGE83L98",       # R-4, R-3, R-2, R-1 fishery recruitment.
+                "MIGE56L69", "MIGE69L83", "MIGE83",                    # R-4, R-3, R-2, R-1 fishery recruitment.
                 "MIGE83L98SC345")                                      # Skip-moulters.
 
 # Load kriging polygons:

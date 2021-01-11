@@ -1,7 +1,7 @@
 library(gulf.data)
 library(gulf.graphics)
 
-language <- language("fr")
+language <- language("en")
 
 x <- read.csv("programs/recruitment/Bayesian Recruitment Model Output.csv")
 
