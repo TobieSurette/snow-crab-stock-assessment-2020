@@ -18,7 +18,7 @@ years <- 2006:2019
 #Sea potato
 
 # Invertebrates:
-species <- c(4210, 4211, 4233, 4235)
+species <- 6300
 species.en <- species(species)
 species.en <- deblank(gsub("[(]unsp.[)]", "", species.en))
 if (species[1] == 2520) species.en <- "Toad crab"

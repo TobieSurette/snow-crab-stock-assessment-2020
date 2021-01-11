@@ -124,7 +124,7 @@ if (language == "english"){
    legend.str <- c("Brem < Blim", "B < Busr")
 }
 if (language == "french"){
-   ylab <- "Probabilit?"
+   ylab <- "Probabilité"
    xlab <- "Niveau de capture (x 1000t)"
    legend.str <- c("Bres < Blim", "B < Bnrs")
 }
