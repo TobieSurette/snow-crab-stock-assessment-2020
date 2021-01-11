@@ -10,7 +10,6 @@ y$tow.id <- tow.id(y)
 import(x, fill = 0) <- catch(y, category = var)
 x$n <- x[, var]
 
-
 # Remove 2013 alternate stations from the analysis:
 remove <- x$grid[(year(x) == 2013) & (substr(x$tow.id, 6, 6) == "A")]
 x <- x[!(x$grid %in% remove), ]
