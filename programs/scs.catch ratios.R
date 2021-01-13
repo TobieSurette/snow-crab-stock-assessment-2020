@@ -5,7 +5,8 @@ library(glmmTMB)
 
 format <- "pdf"
 years <- 2006:2020
-var <- c("FI", "FM", "MI")
+var <- c("FI", "FM", "MI", "COM")
+ylim <- c(3000, 3000, 12000, 2000)
 
 # Read survey grids:
 mif <- scs.survey.grids()
@@ -16,14 +17,16 @@ for (i in 1:length(mif)){
 }
 
 clg()
-file <- paste0(getwd(), "/results/figures/english/scs.catch ratios.", min(years),  "-", max(years))
-gdevice(format, file = file, height = 11, width = 8.5)
+#file <- paste0(getwd(), "/results/figures/english/catch ratios/scs.catch ratios.", min(years),  "-", max(years))
+#gdevice(format, file = file, height = 11, width = 8.5)
 k <- kronecker(matrix(1:(2*length(var)), ncol = 2, byrow = TRUE), matrix(1, ncol = 5, nrow = 5))
-k <- rbind(0,cbind(0,0,k,0,0,0),0,0)
+k <- rbind(0,cbind(0,0,k,0,0),0,0)
 layout(k)
 par(mar = c(0,0,0,0))
-
+models <- list()
 for (j in 1:length(var)){
+   models[[j]] <- list()
+
    x <- read.scsset(years, valid = 1, survey = "regular")
    y <- read.scsbio(years, survey = "regular")
    y$tow.id <- tow.id(y)
@@ -44,53 +47,60 @@ for (j in 1:length(var)){
    x$year<- as.factor(year(x))
    x$grid <- as.factor(x$grid)
 
-   #m <- glmmTMB(n ~ (1|year) + (1| grid) + offset(log(swept.area) - log(1000000)), data = x, family = nbinom2)
-   m <- list()
-   for (i in 1:length(years)){
-      print(years[i])
-      m[[i]] <- glmmTMB(n ~ (1| grid) + offset(log(swept.area) - log(1000000)),
-                        data = x[year(x) == years[i], ],
-                        family = nbinom1,
-                        zi = ~1)
-   }
+   # Analyze total data:
+   x$year.grid <- paste0(x$year, "-", x$grid)
+   m <- glmmTMB(n ~ year + grid + (1| year.grid) + offset(log(swept.area) - log(1000000)),
+                        data = x, family = poisson)
 
-   fun <- function(x) summary(x)$coef$cond[1]
-   mu <- function(x) return(mean(coef(x)[[1]]$grid[,1]))
-   sigma <- function(x){
-      z <- coef(x)[[1]]$grid[,1]
-      return(sd(z) / sqrt(length(z)))
-   }
-
-   v <- unlist(lapply(m, mu))
-   names(v) <- years
-   s <- unlist(lapply(m, sigma))
-   names(s) <- years
-   r <- aggregate(1000000* x$n / x$swept.area, by = x["year"], mean)[, 2]
-   names(r) <- years
-
-   gbarplot(exp(v), years, xaxt = "n", grid = TRUE, )
-   #lines(years, 0.8 * r , col = "blue", lwd = 2)
-   error.bar(years, lower = exp(v - 1.96 * s), upper = exp(v + 1.96 * s))
-   if (j == 3) axis(1, las = 2)
+   # Parse results:
+   year_effect <- m$fit$par[1:length(years)]
+   year_effect[-1] <- year_effect[1] + year_effect[-1]
+   r <- data.frame(year = years,
+                   mu = year_effect,
+                   sigma = sqrt(diag(m$sdr$cov.fixed)[1:length(years)]))
+   r$lower <- r$mu - 1.96 * r$sigma
+   r$upper <- r$mu + 1.96 * r$sigma
+   cols <- c(rep("grey90", 6), "grey70", rep("grey45", 6), "grey20", "grey20")
+   gbarplot(exp(r$mu), years, xaxt = "n", grid = TRUE, ylim = c(0, ylim[j]), col = cols)
+   error.bar(years, lower = exp(r$lower), upper = exp(r$upper))
+   if (j == 4) axis(1, las = 2, at = years, las = 2)
    mtext(category(var[j]), 2, 2.5, cex = 1.0)
    if (j == 1) mtext("Density(#/km2)", 3, 0.5, cex = 1.0)
 
-   delta <- diff(v)
-   ds <- sqrt(s[-1]^2 + s[-length(s)] ^2)
-   gbarplot(100*(exp(delta)-1), years[-length(years)], xaxt = "n", yaxt = "n", ylim = c(-75, 75), grid = TRUE, yaxs = "i")
+   # Annual differences:
+   delta <- diff(r$mu)
+
+   s <- ranef(m)$cond$year.grid
+   year <- as.numeric(lapply(strsplit(rownames(s), "-"), function(x) x[1]))
+   grid <- as.numeric(lapply(strsplit(rownames(s), "-"), function(x) x[2]))
+   mu <- matrix(NA, nrow = 355, ncol = length(years))
+   s <- s[, 1]
+   for (i in 1:length(years)){
+      mu[grid[year == years[i]], i] <- s[year == years[i]]
+   }
+   ds <- NULL
+   n <- NULL
+   for (i in 1:(length(years)-1)){
+      ds[i] <- sd(mu[, i+1] - mu[, i], na.rm  = TRUE)
+      n[i] <- sum(!is.na(mu[, i+1] - mu[, i]))
+   }
+   ds <- ds / sqrt(n)
+   gbarplot(100*(exp(delta)-1), years[-length(years)], col = cols[-1],
+            xaxt = "n", yaxt = "n", ylim = c(-75, 75), grid = TRUE, yaxs = "i")
    hline(0, col = "red")
-   error.bar(years[-length(s)], lower = 100*(exp(delta - 1.96 * ds)-1), upper = 100*(exp(delta + 1.96 * ds)-1))
+   error.bar(years[-length(ds)], lower = 100*(exp(delta - 1.96 * ds)-1), upper = 100*(exp(delta + 1.96 * ds)-1))
    axis(4)
-   if (j == 3) axis(1, at = years[-length(years)], labels = paste0(years[-length(years)], "-", years[-1]), las = 2)
-   if (j == 2) mtext("Percentage", 4, 2.75, cex = 1.0)
-   if (j == 1) mtext("Year-to-year increase (%)", 3, 0.5, cex = 1.0)
+   if (j == 4) axis(1, at = years[-length(years)], labels = paste0(years[-length(years)], "-", years[-1]), las = 2)
+   if (j == 2) mtext("Percentage", 4, 2.75, cex = 1.0, at = -70)
+   if (j == 1) mtext("Year-to-year difference (%)", 3, 0.5, cex = 1.0)
+   box()
 }
-dev.off()
+#dev.off()
 
 # Draw map:
 clg()
 for (j in 1:length(var)){
-   file <- paste0(getwd(), "/results/figures/english/maps/catch ratios ", var[j], ".", min(years),  "-", max(years))
+   file <- paste0(getwd(), "/results/figures/english/catch ratios/catch ratios ", var[j], ".", min(years),  "-", max(years))
    gdevice(format, file = file, height = 11, width = 8.5)
    m <- kronecker(matrix(1:15, ncol = 3), matrix(1, nrow = 5, ncol = 5))
    m <- rbind(0,0,cbind(0, 0, m, 0),0,0)
