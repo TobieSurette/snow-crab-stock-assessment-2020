@@ -2,7 +2,7 @@ library(gulf.data)
 library(gulf.graphics)
 library(gulf.spatial)
 
-var <- "FI"
+var <- "FM"
 
 years <- 2013:2020
 x <- read.scsset(years, valid = 1, survey = "regular")
