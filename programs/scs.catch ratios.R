@@ -6,7 +6,7 @@ library(glmmTMB)
 format <- "pdf"
 years <- 2006:2020
 var <- c("FI", "FM", "MI", "COM")
-ylim <- c(3000, 3000, 12000, 2000)
+ylim <- c(6000, 8000, 16000, 2500)
 
 # Read survey grids:
 mif <- scs.survey.grids()
@@ -17,15 +17,15 @@ for (i in 1:length(mif)){
 }
 
 clg()
-#file <- paste0(getwd(), "/results/figures/english/catch ratios/scs.catch ratios.", min(years),  "-", max(years))
-#gdevice(format, file = file, height = 11, width = 8.5)
+file <- paste0(getwd(), "/results/figures/english/catch ratios/scs.catch ratios.", min(years),  "-", max(years))
+gdevice(format, file = file, height = 11, width = 8.5)
 k <- kronecker(matrix(1:(2*length(var)), ncol = 2, byrow = TRUE), matrix(1, ncol = 5, nrow = 5))
 k <- rbind(0,cbind(0,0,k,0,0),0,0)
 layout(k)
 par(mar = c(0,0,0,0))
-models <- list()
+results <- list()
 for (j in 1:length(var)){
-   models[[j]] <- list()
+   results[[j]] <- list()
 
    x <- read.scsset(years, valid = 1, survey = "regular")
    y <- read.scsbio(years, survey = "regular")
@@ -42,24 +42,29 @@ for (j in 1:length(var)){
    d <- distance(lon(x[ix,]), lat(x[ix,]), lon, lat)
    x$grid[ix] <- apply(d, 1, which.min)
 
+   # Define core set of survey grids:
+   core <- which(apply(table(year(x), x$grid),2,sum) >= 13)
+
    # Prepare data for model:
    x$n <- x[, var[j]]
    x$year<- as.factor(year(x))
    x$grid <- as.factor(x$grid)
+   x$year.grid <- paste0(x$year, "-", x$grid)
 
    # Analyze total data:
-   x$year.grid <- paste0(x$year, "-", x$grid)
-   m <- glmmTMB(n ~ year + grid + (1| year.grid) + offset(log(swept.area) - log(1000000)),
-                        data = x, family = poisson)
+   m <- glmmTMB(n ~ year + (1|grid) + (1| year.grid) + offset(log(swept.area) - log(1000000)),
+                data = x, #[x$grid %in% core, ],
+                family = nbinom1)
 
    # Parse results:
    year_effect <- m$fit$par[1:length(years)]
    year_effect[-1] <- year_effect[1] + year_effect[-1]
    r <- data.frame(year = years,
-                   mu = year_effect,
+                   mu = as.numeric(year_effect),
                    sigma = sqrt(diag(m$sdr$cov.fixed)[1:length(years)]))
    r$lower <- r$mu - 1.96 * r$sigma
    r$upper <- r$mu + 1.96 * r$sigma
+
    cols <- c(rep("grey90", 6), "grey70", rep("grey45", 6), "grey20", "grey20")
    gbarplot(exp(r$mu), years, xaxt = "n", grid = TRUE, ylim = c(0, ylim[j]), col = cols)
    error.bar(years, lower = exp(r$lower), upper = exp(r$upper))
@@ -71,13 +76,20 @@ for (j in 1:length(var)){
    delta <- diff(r$mu)
 
    s <- ranef(m)$cond$year.grid
+   grid_effect <- ranef(m)$cond$grid
    year <- as.numeric(lapply(strsplit(rownames(s), "-"), function(x) x[1]))
    grid <- as.numeric(lapply(strsplit(rownames(s), "-"), function(x) x[2]))
    mu <- matrix(NA, nrow = 355, ncol = length(years))
-   s <- s[, 1]
    for (i in 1:length(years)){
-      mu[grid[year == years[i]], i] <- s[year == years[i]]
+      ix <- intersect(as.numeric(rownames(grid_effect)), grid[year == years[i]])
+      mu[ix, i] <- year_effect[i] + grid_effect[as.character(ix), 1] + s[paste0(years[i], "-", ix),1]
    }
+   rownames(mu) <- 1:355
+   colnames(mu) <- years
+
+   # Store grid inferences:
+   results[[j]] <- mu
+
    ds <- NULL
    n <- NULL
    for (i in 1:(length(years)-1)){
@@ -86,16 +98,16 @@ for (j in 1:length(var)){
    }
    ds <- ds / sqrt(n)
    gbarplot(100*(exp(delta)-1), years[-length(years)], col = cols[-1],
-            xaxt = "n", yaxt = "n", ylim = c(-75, 75), grid = TRUE, yaxs = "i")
+            xaxt = "n", yaxt = "n", ylim = c(-60, 60), grid = TRUE, yaxs = "i")
    hline(0, col = "red")
    error.bar(years[-length(ds)], lower = 100*(exp(delta - 1.96 * ds)-1), upper = 100*(exp(delta + 1.96 * ds)-1))
-   axis(4)
+   if (j == 1) axis(4) else axis(4, at = seq(-60, 40, by = 20))
    if (j == 4) axis(1, at = years[-length(years)], labels = paste0(years[-length(years)], "-", years[-1]), las = 2)
    if (j == 2) mtext("Percentage", 4, 2.75, cex = 1.0, at = -70)
    if (j == 1) mtext("Year-to-year difference (%)", 3, 0.5, cex = 1.0)
    box()
 }
-#dev.off()
+dev.off()
 
 # Draw map:
 clg()
@@ -107,39 +119,20 @@ for (j in 1:length(var)){
    layout(m)
    par(mar = c(0,0,0,0))
    for (i in 1:(length(years)-1)){
-      m <- models[[j]][[i]]
-      mu <- coef(m)[[1]]$grid[, 1]
-      grid <- as.numeric(rownames(coef(m)[[1]]$grid))
-      r <- data.frame(grid = 1:355)
-      r$x <- NA
-      r$x[match(grid, r$grid)] <- mu
-      m <- models[[j]][[i+1]]
-      mu <- coef(m)[[1]]$grid[, 1]
-      grid <- as.numeric(rownames(coef(m)[[1]]$grid))
-      r$y <- NA
-      r$y[match(grid, r$grid)] <- mu
-
+      mu <- results[[j]]
+      d <- mu[,i+1] - mu[,i]
+      d <- d[!is.na(d)]
       map.new()
-      cols <- colorRampPalette(c("red", "white", "blue"))(1000)
+      cols <- rev(colorRampPalette(c("red", "white", "blue"))(1000))
+      for (k in 1:length(d)){
+         ix <- as.numeric(names(d)[k])
+         p <- km2deg(mif[[ix]]$x, mif[[ix]]$y)
+         p <- as.polygon(p$longitude, p$latitude)
 
-      for (k in 1:nrow(r)){
-         if (!is.na(r$y[k]-r$x[k])){
-            p <- km2deg(mif[[k]]$x, mif[[k]]$y)
-            p <- as.polygon(p$longitude, p$latitude)
-
-            delta <- r$y[k] - r$x[k]
-            delta <- delta / 2.0
-            delta[delta <= -1] <- -1
-            delta[delta >= 1] <- 1
-
-            scale <- 1
-            mx <- mean(p[[1]]$x[1:4])
-            my <- mean(p[[1]]$y[1:4])
-            p[[1]]$x <- sqrt(scale) * (p[[1]]$x - mx) + mx
-            p[[1]]$y <- sqrt(scale) * (p[[1]]$y - my) + my
-
-            plot(p, col = cols[round((delta + 1)/ 2 * length(cols))], border = "grey60", lwd = 0.4)
-         }
+         delta <- d[k] / 1.0
+         delta[delta <= -1] <- -1
+         delta[delta >= 1] <- 1
+         plot(p, col = cols[round((delta + 1)/ 2 * length(cols))], border = "grey60", lwd = 0.4)
       }
       map("coast", col = "floralwhite", border = "saddlebrown", lwd = 0.4)
       box()
@@ -150,11 +143,11 @@ for (j in 1:length(var)){
       plot(v, add = TRUE)
 
       # Draw legend:
-      rr <- ((log(c(0.2, 0.5, 0.66666, 1, 1.5, 2, 5)) / 2.0)+1)/2
+      rr <- ((log(c(0.5, 0.66666, 0.75, 1, 1.333333, 1.5, 2)) / 1.0)+1)/2
       legend("bottomleft",
-             legend = c("5:1", "2:1", "3:2", "1:1", "2:3", "1:2", "1:5"),
+             legend = c("2:1", "3:2", "4:3", "1:1", "3:4", "2:3", "1:2"),
              pch = 22,  pt.cex = 2.5,
-             pt.bg = cols[round(rr * 1000)],
+             pt.bg = rev(cols[round(rr * 1000)]),
              bg = "white", cex = 0.75, lwd = 0.4, col = "grey60",
              title = expression(paste("catch ratio(#)")))
       text(-61.1, 48.9, paste0(years[i], "-", (years[i]+1)), cex = 1.25)
