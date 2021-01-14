@@ -147,7 +147,7 @@ for (j in 1:length(var)){
       legend("bottomleft",
              legend = c("2:1", "3:2", "4:3", "1:1", "3:4", "2:3", "1:2"),
              pch = 22,  pt.cex = 2.5,
-             pt.bg = rev(cols[round(rr * 1000)]),
+             pt.bg = cols[round(rr * 1000)],
              bg = "white", cex = 0.75, lwd = 0.4, col = "grey60",
              title = expression(paste("catch ratio(#)")))
       text(-61.1, 48.9, paste0(years[i], "-", (years[i]+1)), cex = 1.25)
