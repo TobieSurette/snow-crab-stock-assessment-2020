@@ -42,8 +42,9 @@ for (j in 1:length(var)){
    d <- distance(lon(x[ix,]), lat(x[ix,]), lon, lat)
    x$grid[ix] <- apply(d, 1, which.min)
 
-   # Define core set of survey grids:
-   core <- which(apply(table(year(x), x$grid),2,sum) >= 13)
+   # Define different sets of survey grids:
+   core <- which(apply(table(year(x), x$grid),2,sum) >= 13) # Common grids in use over the time series.
+   comparative <- sort(scs.survey.grid(read.scsset(2019, survey = "comparative", valid = 1))) # Comparative survey grid.
 
    # Prepare data for model:
    x$n <- x[, var[j]]
