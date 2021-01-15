@@ -98,6 +98,10 @@ for (j in 1:length(var)){
       n[i] <- sum(!is.na(mu[, i+1] - mu[, i]))
    }
    ds <- ds / sqrt(n)
+
+   print(var[j])
+   print(cbind(years[-length(years)], 100*(exp(delta)-1)))
+
    gbarplot(100*(exp(delta)-1), years[-length(years)], col = cols[-1],
             xaxt = "n", yaxt = "n", ylim = c(-60, 60), grid = TRUE, yaxs = "i")
    hline(0, col = "red")
