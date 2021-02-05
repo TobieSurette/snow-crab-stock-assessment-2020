@@ -8,15 +8,16 @@ Busr   <- 41371 # Upper stock reference biomass.
 #ER <- 0.406    # Exploitation rate for this year.
 n <- 50000      # Number of random samples.
 TAC <- 31410
-pbias <- 0.00   # Bias to add into analysis
+pbias <- 0.12   # Bias to add into analysis
 
 # BMMGE95.2019.mu <- (1-pbias) * 79065.50       # Estimated commercial biomass
 # BMMGE95.2019.sigma <- (1-pbias) * 5364.855
 BMMGE95.2020.mu <- (1-pbias) * 77748.1       # Estimated commercial biomass
 BMMGE95.2020.sigma <- (1-pbias) * 5397.4
 
-BREC.2021.mu    <- 79870         # Projected recruitment R-1 from the Bayesian model.
-BREC.2021.sigma <- 15980
+rbias <- 0.3
+BREC.2021.mu    <- (1-rbias) * 79870         # Projected recruitment R-1 from the Bayesian model.
+BREC.2021.sigma <- (1-rbias) * 15980
 ER <- TAC / BMMGE95.2020.mu
 quota <- TAC
 
