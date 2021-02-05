@@ -19,8 +19,9 @@ BMMGE95.2019.sigma <- (1-pbias) * 5364.855
 #20   55.87	  10.46
 #25   53.2	  10.01
 #30   50.84	   9.693
-BREC.2020.mu <- 66790          # Projected recruitment R-1 from the Bayesian model.
-BREC.2020.sigma <- 12910
+rbias <- 0.3
+BREC.2020.mu <- (1-rbias) * 66790          # Projected recruitment R-1 from the Bayesian model.
+BREC.2020.sigma <- (1-rbias) * 12910
 ER <- TAC / BMMGE95.2019.mu
 quota <- TAC
 
