@@ -4,9 +4,10 @@
 Brecov <- 9970  # Recovery biomass.
 Busr   <- 41371   # Upper stock reference biomass.
 #ER <- 0.406     # Exploitation rate for this year.
-n      <- 50000      # Number of random samples.
+n      <- 10000      # Number of random samples.
 TAC <- 32100.59
-pbias <- 0.30
+#TAC <- 28156  # Actual landings for 2020
+pbias <- 0.18
 BMMGE95.2019.mu <- (1-pbias) * 79065.50       # Estimated biomass
 BMMGE95.2019.sigma <- (1-pbias) * 5364.855
 

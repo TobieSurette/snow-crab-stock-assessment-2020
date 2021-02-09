@@ -8,7 +8,7 @@ Busr   <- 41371 # Upper stock reference biomass.
 #ER <- 0.406    # Exploitation rate for this year.
 n <- 50000      # Number of random samples.
 TAC <- 31410
-pbias <- 0.12   # Bias to add into analysis
+pbias <- 0.20   # Bias to add into analysis
 
 # BMMGE95.2019.mu <- (1-pbias) * 79065.50       # Estimated commercial biomass
 # BMMGE95.2019.sigma <- (1-pbias) * 5364.855
@@ -117,6 +117,8 @@ rownames(tab) <- NULL
 
 ref.tab <- tab[(nrow(tab)-2):nrow(tab), ]
 tab <- tab[1:(nrow(tab)-3), ]
+
+tab[tab$catch == 31410, ]
 
 # Probability of exceeding ER plot:
 if (language == "english"){
