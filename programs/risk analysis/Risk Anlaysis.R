@@ -1,5 +1,4 @@
 # Converted risk analysis program (from Analytica)
-
 language <- language("en")
 
 # Define constants and
@@ -9,16 +8,13 @@ Busr   <- 41371 # Upper stock reference biomass.
 n <- 50000      # Number of random samples.
 TAC <- 31410
 pbias <- 0.10   # Bias to add into analysis
-
-# BMMGE95.2019.mu <- (1-pbias) * 79065.50       # Estimated commercial biomass
-# BMMGE95.2019.sigma <- (1-pbias) * 5364.855
-BMMGE95.2020.mu <- (1-pbias) * 77748.1       # Estimated commercial biomass
-BMMGE95.2020.sigma <- (1-pbias) * 5397.4
+BMMGE95.2020.mu <- 77748.1       # Estimated commercial biomass
+BMMGE95.2020.sigma <- 5397.4
 
 rbias <- 0.3
 BREC.2021.mu    <- (1-rbias) * 79870         # Projected recruitment R-1 from the Bayesian model.
 BREC.2021.sigma <- (1-rbias) * 15980
-ER <- TAC / BMMGE95.2020.mu
+#ER <- TAC / ((1-pbias) * BMMGE95.2020.mu)
 quota <- TAC
 
 # Reparameterize log-normal distribution:
@@ -27,18 +23,6 @@ rlnorm <- function(n, mu, sigma){
    xbar <- log(mu) - (s^2)/2
    return(stats::rlnorm(n, xbar, s))
 }
-
-#2018:
-#  variable polygon     area mean.sample sd.sample n.sample     mean       sd  lowerCI  upperCI      mean.CV    mad.CV     sd.CV
-#1      COM    gulf 57842.85    81030.25 115592.91      354 80671.86 5302.936 70777.08 91554.34 -0.020367050 1.0922650 1.7312318
-#2  COMSC12    gulf 57842.85    58504.79  94899.41      354 59561.91 4338.845 51510.38 68508.41 -0.023559313 0.8783964 1.4660781
-#3 COMSC345    gulf 57842.85    22525.47  48161.35      354 21437.56 2311.083 17265.03 26312.70 -0.005818429 0.3394293 0.7297618
-
-#2019:
-#  variable polygon     area mean.sample sd.sample n.sample     mean       sd  lowerCI  upperCI      mean.CV    mad.CV    sd.CV
-#1      COM    gulf 57842.85    81007.09 112930.89      352 79065.50 5364.855 69071.53 90090.73 -0.008609671 1.0453785 1.740335
-#2  COMSC12    gulf 57842.85    59982.09  99286.08      352 58995.30 4760.665 50214.73 68862.82 -0.015845260 0.8995601 1.579778
-#3 COMSC345    gulf 57842.85    21025.01  39789.18      352 20290.99 1830.448 16939.94 24108.74 -0.000148860 0.3171853 0.549708
 
 # Landings and biomass stats:
 # Warning! Landings and residual biomass estimates have the same year, but total biomass is offset by one year
@@ -59,11 +43,25 @@ MMGE95 <- MMGE95SC345
 survivorship <- MMGE95SC345
 for (i in 1:n){
    if ((i %% 1000) == 0) print(i)
+   bias <- pbias
    for (j in 1:nrow(data)){
-      MMGE95SC345[i,j] <- rlnorm(1, data$MMGE95SC345.mu[j], data$MMGE95SC345.sigma[j])
-      MMGE95[i,j] <- rlnorm(1, data$MMGE95.mu[j], data$MMGE95.sigma[j])
+      if (data$year[j] %in% c(2019, 2020)){
+         MMGE95SC345[i,j] <- (1 - bias) * rlnorm(1, data$MMGE95SC345.mu[j], data$MMGE95SC345.sigma[j])
+      }else{
+         MMGE95SC345[i,j] <- rlnorm(1, data$MMGE95SC345.mu[j], data$MMGE95SC345.sigma[j])
+      }
+      if (data$year[j] %in% 2020){
+         MMGE95[i,j] <- (1 - bias) * rlnorm(1, data$MMGE95.mu[j], data$MMGE95.sigma[j])
+      }else{
+         MMGE95[i,j] <- rlnorm(1, data$MMGE95.mu[j], data$MMGE95.sigma[j])
+      }
       survivorship[i,j] <- (data$landings[j] + MMGE95SC345[i,j]) / MMGE95[i,j]
    }
+   # Simulate biomass for 2020:
+   BMMGE95.2020[i] <- (1 - bias) * rnorm(1, BMMGE95.2020.mu, BMMGE95.2020.sigma)
+
+   # R-1 2021 mu and sigma:
+   BREC.2021[i] <-  (1 - rbias) * rnorm(1, BREC.2021.mu, BREC.2021.sigma)
 }
 colnames(MMGE95SC345)  <- data$year
 colnames(MMGE95)       <- data$year
@@ -73,52 +71,31 @@ colnames(survivorship) <- data$year
 S.sim <- apply(survivorship[, (ncol(survivorship)-4):ncol(survivorship)], 1, mean)
 S <- mean(S.sim)
 
-# Simulate biomass for 2020:
-BMMGE95.2020 <- rnorm(n, BMMGE95.2020.mu, BMMGE95.2020.sigma)
-
-# Define vector of catch options:
-
-#catch <- c(seq(18, 80, by = 0.25) * 1000 , quota, 37058, 53859)
-catch <- c(seq(18, 120, by = 0.25) * 1000 , quota, 41731, 90233)
-catch <- c(catch[catch < quota], quota, catch[catch >= quota])
-
 # Calculate remaining biomass for 2021:
 BREM.2021 <- repvec(BMMGE95.2020 * S, ncol = length(catch)) - repvec(catch, nrow = n)
 
 # Probability of remaining biomass being below Blim in 2020:
 Plim <- apply(BREM.2021 < Brecov, 2, function(x) sum(x) / length(x))
-names(Plim) <- catch
-plot(catch, Plim)
 
 # Probability of exceeding ER in 2021:
 ER.2021 <- repvec(catch, nrow = n) / repvec(BMMGE95.2020, ncol = length(catch))  # Calculate simulated exploitation rates:
 PER <- apply(ER.2021 > ER, 2, function(x) sum(x) / length(x))
-names(PER) <- catch
-plot(catch, PER)
-
-# R-1 2021 mu and sigma:
-BREC.2021 <- rnorm(n, BREC.2021.mu, BREC.2021.sigma)
 
 # Probability of exceeding Busr in 2019:
-Pusr <- apply((BREC.2021 + BREM.2021) < Busr, 2, function(x) sum(x) / length(x))
-names(Pusr) <- catch
-plot(catch, Pusr)
+Pusr <- apply((repvec(BREC.2021, ncol = length(catch)) + BREM.2021) < Busr, 2, function(x) sum(x) / length(x))
 
 # Define summary table:
 tab <- data.frame(catch = catch,
                   P.lim = Plim,
                   P.usr = Pusr,
-                  P.ER = PER,
-                  mu = apply(BREC.2021 + BREM.2021, 2, mean),
-                  lci = apply(BREC.2021 + BREM.2021, 2, quantile, p = 0.025),
-                  uci = apply(BREC.2021 + BREM.2021, 2, quantile, p = 0.975))
+                  mu = apply(repvec(BREC.2021, ncol = length(catch)) + BREM.2021, 2, mean),
+                  lci = apply(repvec(BREC.2021, ncol = length(catch)) + BREM.2021, 2, quantile, p = 0.025),
+                  uci = apply(repvec(BREC.2021, ncol = length(catch)) + BREM.2021, 2, quantile, p = 0.975))
 
 rownames(tab) <- NULL
 
 ref.tab <- tab[(nrow(tab)-2):nrow(tab), ]
 tab <- tab[1:(nrow(tab)-3), ]
-
-tab[tab$catch == 31410, ]
 
 # Probability of exceeding ER plot:
 if (language == "english"){
