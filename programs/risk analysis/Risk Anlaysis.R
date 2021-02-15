@@ -123,6 +123,3 @@ text(approx(tab$P.lim, tab$catch, 0.5)$y / 1000, 0.25, paste0("= ", round(approx
 lines(rep(approx(tab$P.usr, tab$catch, 0.5)$y, 2) / 1000, c(0, 0.5), lwd = 1.5, col = "blue", lty = "dashed")
 points(approx(tab$P.usr, tab$catch, 0.5)$y / 1000, 0.5, pch = 21, bg = "blue", cex = 1.5)
 text(approx(tab$P.usr, tab$catch, 0.5)$y / 1000, 0.25, paste0("= ", round(approx(tab$P.usr, tab$catch, 0.5)$y), " t"), pos = 4, cex = 1.4)
-
-
-
