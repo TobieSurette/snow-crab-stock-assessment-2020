@@ -12,7 +12,7 @@ n      <- 100000 # Number of random samples.
 
 # Bias specifications:
 range <- FALSE      # Whether to treat bias.scs as a uniform range of [0, bias.scs]
-bias.scs  <- 0.10   # Negative bias applied to snow crab survey from 2019 and 2020 estimates.
+bias.scs  <- 0.20    # Negative bias applied to snow crab survey from 2019 and 2020 estimates.
 bias.rec  <- 0.30   # Negative bias applied to recruitment predictions.
 if (range) bias.scs  <- bias.scs * runif(n) # Simulate bias for snow crab survey.
 
