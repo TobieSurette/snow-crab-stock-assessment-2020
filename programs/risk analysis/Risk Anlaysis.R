@@ -7,13 +7,14 @@ language <- language("en")
 Brecov <- 9970   # Recovery biomass limit reference pont.
 Busr   <- 41371  # Upper stock reference biomass.
 TAC    <- 31410  # Total allowable catch for sGSL.
-n      <- 50000 # Number of random samples.
+n      <- 100000 # Number of random samples.
 #ER     <- 0.4
 
 # Bias specifications:
-bias.scs  <- 0.15  # Negative bias applied to snow crab survey from 2019 and 2020 estimates.
+range <- FALSE      # Whether to treat bias.scs as a uniform range of [0, bias.scs]
+bias.scs  <- 0.10   # Negative bias applied to snow crab survey from 2019 and 2020 estimates.
 bias.rec  <- 0.30   # Negative bias applied to recruitment predictions.
-#bias.scs  <- bias.scs * runif(n) # Simulate bias for snow crab survey.
+if (range) bias.scs  <- bias.scs * runif(n) # Simulate bias for snow crab survey.
 
 # Define biomass estimates:
 BMMGE95.2020.mu    <- 77748.1  # Estimated kriged commercial biomass.
@@ -49,21 +50,19 @@ mortality <- MMGE95SC345
 
 # Loop over years:
 for (j in 1:nrow(data)){
-   # Simulate residual biomass:
-   if (data$year[j] %in% c(2019, 2020)) bias <- (1 - bias.scs) else bias <- 1
-   MMGE95SC345[,j] <- rlnorm(n, bias * data$MMGE95SC345.mu[j], bias * data$MMGE95SC345.sigma[j])
-
-   # Simulate total biomass:
-   if (data$year[j] %in% c(2020)) bias <- (1 - bias.scs) else bias <- 1
-   MMGE95[,j] <- rlnorm(n, bias * data$MMGE95.mu[j], bias * data$MMGE95.sigma[j])
+   # Simulate biomass:
+   if (data$year[j] %in% c(2019, 2020)) scale <- (1 - bias.scs) else scale <- 1                    # Define bias by year.
+   MMGE95SC345[,j] <- rlnorm(n, scale * data$MMGE95SC345.mu[j], scale * data$MMGE95SC345.sigma[j]) # Residual biomass.
+   if (data$year[j] %in% c(2020)) scale <- (1 - bias.scs) else scale <- 1                          # Define bias by year.
+   MMGE95[,j]      <- rlnorm(n, scale * data$MMGE95.mu[j], scale * data$MMGE95.sigma[j])           # Total biomass.
 
    # Calculate mortality:
    mortality[,j] <- 1 - ((data$landings[j] + MMGE95SC345[,j]) / MMGE95[,j])
 }
-BMMGE95.2020 <-  rlnorm(n, (1 - bias.scs) * BMMGE95.2020.mu, (1 - bias.scs) * BMMGE95.2020.sigma)  # Simulate biomass for current year.
-BREC.2021    <- rlnorm(n, (1 - bias.rec) * BREC.2021.mu, (1 - bias.rec) * BREC.2021.sigma)        # Projected R-1 mu and sigma.
+BMMGE95.2020 <- rlnorm(n, (1 - bias.scs) * BMMGE95.2020.mu, (1 - bias.scs) * BMMGE95.2020.sigma) # Simulate biomass for current year.
+BREC.2021    <- rlnorm(n, (1 - bias.rec) * BREC.2021.mu, (1 - bias.rec) * BREC.2021.sigma)       # Projected R-1 mu and sigma.
 
-# 5-year survivorship value:
+# Average 5-year survival value:
 S <- mean(apply(1-mortality[, (ncol(mortality)-4):ncol(mortality)], 1, mean))
 
 # Define vector of catch options:
