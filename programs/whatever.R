@@ -4,7 +4,7 @@ library(gulf.data)
 p <- read.csv("data/raw/scs.passive.phase.swept.area.2017-2019.csv")
 
 # Calculate correction factors:
-s <- read.scsset(2018:2019, valid = 1, survey = "regular")
+s <- read.scsset(2017:2019, valid = 1, survey = "regular")
 s$year <- year(s)
 
 ix <- match(s[c("year", "tow.id")], p[c("year", "tow.id")])

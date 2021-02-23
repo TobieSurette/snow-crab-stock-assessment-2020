@@ -4,7 +4,7 @@ library(gulf.graphics)
 library(gulf.spatial)
 
 # Survey year:
-year <- 2020
+year <- 1999
 output <- "results/tables/"
 categories <- c("COM", "COMSC12", "COMSC345") # Define catch categories.
 
@@ -15,6 +15,7 @@ p <- p[c("gulf", "zone12_expanded", "zone12", "zone19", "zoneE", "zoneF", "zoneE
 # Read three years of data (for variogram averaging):
 s <- read.scsset(year = (year-2):year, survey = "regular", valid = 1) # Tow data.
 b <- read.scsbio(year = (year-2):year, survey = "regular")            # Biological data.
+b$tow.id <- tow.id(b)
 
 # Import catch data:
 import(s, fill = 0) <- catch(b, category = categories, weight = TRUE, as.hard.shelled = TRUE, units = "t") # Merge catches.
