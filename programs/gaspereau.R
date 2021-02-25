@@ -45,18 +45,36 @@ points(x$longitude[x$depth <= 0], x$latitude[x$depth <= 0], pch = 21, bg = "gree
 # Prepare data for analysis:
 x           <- x[, setdiff(names(x), as.character(c(0:12, 34:50)))] # Remove small and over-large fish.
 fvars       <- names(x)[gsub("[0-9]", "", names(x)) == ""]
-data <- data.frame(f     = as.vector(as.matrix(x[fvars])),
-                   length = as.numeric(repvec(fvars, nrow = nrow(x))),
-                   distance = rep(x$distance, each = length(fvars)),
-                   year = rep(year(x), each = length(fvars)),
-                   gear = as.factor(rep(x$gear.type, each = length(fvars))),
-                   xkm = rep(x$xkm, each = length(fvars)),
-                   ykm = rep(x$ykm, each = length(fvars)),
-                   depth = rep(x$depth, each = length(fvars)),
+data <- data.frame(f         = as.vector(as.matrix(x[fvars])),
+                   length    = as.factor(as.numeric(repvec(fvars, nrow = nrow(x)))),
+                   distance  = rep(x$distance, each = length(fvars)),
+                   year      = as.factor(rep(year(x), each = length(fvars))),
+                   gear      = as.factor(rep(x$gear.type, each = length(fvars))),
+                   xkm       = rep(x$xkm, each = length(fvars)),
+                   ykm       = rep(x$ykm, each = length(fvars)),
+                   depth     = rep(x$depth, each = length(fvars)),
                    log.depth = rep(log(x$depth), each = length(fvars)),
-                   station = as.factor(rep(x$station, each = length(fvars))))
+                   station   = as.factor(rep(x$station, each = length(fvars))))
 
-gam()
+# Fit models:
+model <- list()
+model[[1]] <- gam(f ~ length + offset(distance/0.625), family = poisson, data = data)
+model[[2]] <- gam(f ~ length + s(depth) + offset(distance/0.625), family = poisson, data = data)
+model[[3]] <- gam(f ~ length + depth + I(depth^2) + offset(distance/0.625), family = poisson, data = data)
+model[[4]] <- gam(f ~ length + depth + I(depth^2) + s(xkm,ykm) + offset(distance/0.625), family = poisson, data = data)
+model[[5]] <- gam(f ~ length + depth + I(depth^2) + s(xkm,ykm) + s(xkm,ykm, by = year) + offset(distance/0.625), family = poisson, data = data)
+
+# Linear interaction:
+model[[6]] <- gam(f ~ length * year + offset(distance/0.625), family = poisson, data = data)
+model[[7]] <- gam(f ~ length * year + s(depth) + offset(distance/0.625), family = poisson, data = data)
+model[[8]] <- gam(f ~ length * year + depth + I(depth^2) + offset(distance/0.625), family = poisson, data = data)
+model[[9]] <- gam(f ~ length * year + depth + I(depth^2) + s(xkm,ykm) + offset(distance/0.625), family = poisson, data = data)
+#model[[10]] <- gam(f ~ length * year + depth + I(depth^2) + s(xkm,ykm) + s(xkm,ykm, by = year) + offset(distance/0.625), family = poisson, data = data)
+
+m <- gamm4(f ~ length, random = ~ (1|station), family = poisson, data = data)
+m <- gamm4(f ~ 1 + offset(distance/0.625), random = ~ (1|length) + (1|year), family = poisson, data = data)
+
+m <- gamm4(f ~ 1 + s(xkm, ykm) + offset(distance/0.625), random = ~ (1|length) + (1|year), family = poisson, data = data)
 
 # Define variables which define the data set:
 xlim = c(-64.9, -61.75)
