@@ -2,12 +2,6 @@ library(gulf.data)
 library(gulf.graphics)
 library(gulf.spatial)
 
-s <- read.scsset(2020, survey = "regular", valid = 1)
-d <-  time(s, "liftoff") - time(s, "stop")
-d <- d[d>0 & d< 18]
-mean(d)*60
-median(d)*60
-
 # Load survey data:
 language <- language("en")
 output <- "pdf"
@@ -96,9 +90,9 @@ for (i in 1:length(years)){
       axis(1, at = xat[seq(2, length(xat), by = 2)], las = las)
    }
 
-   text(par("usr")[1] + 0.85 * diff(par("usr")[1:2]),
-        par("usr")[3] + 0.9 * diff(par("usr")[3:4]),
-        years[i], cex = 1.80, font = 2)
+   #text(par("usr")[1] + 0.85 * diff(par("usr")[1:2]),
+   #     par("usr")[3] + 0.9 * diff(par("usr")[3:4]),
+   #     years[i], cex = 1.80, font = 2)
 
    if (language == "french"){
       if ((i == 1) & (length(years) == 2)) mtext(expression("Densité (nombre / km"^2*")"), 2, 3, at = 0, cex = 1.45)
