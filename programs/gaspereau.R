@@ -1,6 +1,7 @@
 library(gulf.data)
 library(gulf.graphics)
 library(gulf.spatial)
+library(gamm4)
 
 years <- 2007:2019
 
@@ -16,17 +17,46 @@ import(x, fill = 0) <- freq(z, by = key(x))
 x$gear.type <- gear(x$gear)
 x$longitude <- -dmm2deg(lon(x))
 x$latitude  <- dmm2deg(lat(x))
-x$depth     <- depth(x)
-# x$fishing.zone <- fishing.zone(longitude(x), latitude(x), species = 2550)
-# x$station <- fill in ...
+x$depth     <- depth(x$longitude, x$latitude)
+x <- x[x$depth > 0, ]
+x$station   <- station(x, method  = "latlong")
+fvars       <- names(x)[gsub("[0-9]", "", names(x)) == ""]
 
-
+# Prepare interpolation grid:
+grid       <- read.gulf.spatial("nss stations")
+grid       <- grid[grid$longitude <= -61.90, ]
+tmp        <- deg2km(grid$longitude, grid$latitude)
+names(tmp) <- c("xkm", "ykm")
+grid       <- cbind(grid, tmp)
+grid$depth <- depth(grid$longitude, grid$latitude)
 # Draw map of samples:
 map.new(xlim = c(-65.25, -61.75), ylim = c(45.5, 47.25))
 map("coastline")
-points(x$longitude, x$latitude)
+points(x$longitude, x$latitude, pch = 21, bg = "grey")
+points(grid$longitude, grid$latitude, pch = 21, bg = "red")
 map.axis(1:4)
 box()
+tmp <- deg2km(x$longitude, x$latitude)
+names(tmp) <- c("xkm", "ykm")
+x <- cbind(x, tmp)
+
+points(x$longitude[x$depth <= 0], x$latitude[x$depth <= 0], pch = 21, bg = "green")
+
+# Prepare data for analysis:
+x           <- x[, setdiff(names(x), as.character(c(0:12, 34:50)))] # Remove small and over-large fish.
+fvars       <- names(x)[gsub("[0-9]", "", names(x)) == ""]
+data <- data.frame(f     = as.vector(as.matrix(x[fvars])),
+                   length = as.numeric(repvec(fvars, nrow = nrow(x))),
+                   distance = rep(x$distance, each = length(fvars)),
+                   year = rep(year(x), each = length(fvars)),
+                   gear = as.factor(rep(x$gear.type, each = length(fvars))),
+                   xkm = rep(x$xkm, each = length(fvars)),
+                   ykm = rep(x$ykm, each = length(fvars)),
+                   depth = rep(x$depth, each = length(fvars)),
+                   log.depth = rep(log(x$depth), each = length(fvars)),
+                   station = as.factor(rep(x$station, each = length(fvars))))
+
+gam()
 
 # Define variables which define the data set:
 xlim = c(-64.9, -61.75)
