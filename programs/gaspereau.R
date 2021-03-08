@@ -1,10 +1,9 @@
 library(gulf.data)
 library(gulf.graphics)
 library(gulf.spatial)
-library(gamm4)
+library(mgcv)
 
 years <- 2007:2019
-
 x <- read.nssset(years, survey = "regular")
 y <- read.nsscat(years, survey = "regular", species = "gaspereau")
 z <- read.nsslen(years, survey = "regular", species = "gaspereau")
@@ -29,18 +28,6 @@ tmp        <- deg2km(grid$longitude, grid$latitude)
 names(tmp) <- c("xkm", "ykm")
 grid       <- cbind(grid, tmp)
 grid$depth <- depth(grid$longitude, grid$latitude)
-# Draw map of samples:
-map.new(xlim = c(-65.25, -61.75), ylim = c(45.5, 47.25))
-map("coastline")
-points(x$longitude, x$latitude, pch = 21, bg = "grey")
-points(grid$longitude, grid$latitude, pch = 21, bg = "red")
-map.axis(1:4)
-box()
-tmp <- deg2km(x$longitude, x$latitude)
-names(tmp) <- c("xkm", "ykm")
-x <- cbind(x, tmp)
-
-points(x$longitude[x$depth <= 0], x$latitude[x$depth <= 0], pch = 21, bg = "green")
 
 # Prepare data for analysis:
 x           <- x[, setdiff(names(x), as.character(c(0:12, 34:50)))] # Remove small and over-large fish.
@@ -54,27 +41,30 @@ data <- data.frame(f         = as.vector(as.matrix(x[fvars])),
                    ykm       = rep(x$ykm, each = length(fvars)),
                    depth     = rep(x$depth, each = length(fvars)),
                    log.depth = rep(log(x$depth), each = length(fvars)),
-                   station   = as.factor(rep(x$station, each = length(fvars))))
+                   station   = as.factor(rep(x$station, each = length(fvars))),
+                   data$off  = log(data$distance / 0.625))
 
-# Fit models:
+# Fit various models:
 model <- list()
-model[[1]] <- gam(f ~ length + offset(distance/0.625), family = poisson, data = data)
-model[[2]] <- gam(f ~ length + s(depth) + offset(distance/0.625), family = poisson, data = data)
-model[[3]] <- gam(f ~ length + depth + I(depth^2) + offset(distance/0.625), family = poisson, data = data)
-model[[4]] <- gam(f ~ length + depth + I(depth^2) + s(xkm,ykm) + offset(distance/0.625), family = poisson, data = data)
-model[[5]] <- gam(f ~ length + depth + I(depth^2) + s(xkm,ykm) + s(xkm,ykm, by = year) + offset(distance/0.625), family = poisson, data = data)
+model[[1]] <- gamm(f ~ 1 + offset(off), random = list(year = ~1, length = ~ 1), family = poisson, data = data)
+model[[2]] <- gamm(f ~ 1 + s(xkm, ykm) + offset(off), random = list(year = ~1, length = ~ 1), family = poisson, data = data)
+model[[3]] <- gamm(f ~ 1 + s(xkm, ykm) + offset(off), random = list(year = ~1, length = ~ 1), family = poisson, data = data)
+model[[4]] <- gamm(f ~ 1 + offset(off), random = list(year = ~1, length = ~ 1, station = ~1), family = poisson, data = data)
 
-# Linear interaction:
-model[[6]] <- gam(f ~ length * year + offset(distance/0.625), family = poisson, data = data)
-model[[7]] <- gam(f ~ length * year + s(depth) + offset(distance/0.625), family = poisson, data = data)
-model[[8]] <- gam(f ~ length * year + depth + I(depth^2) + offset(distance/0.625), family = poisson, data = data)
-model[[9]] <- gam(f ~ length * year + depth + I(depth^2) + s(xkm,ykm) + offset(distance/0.625), family = poisson, data = data)
-#model[[10]] <- gam(f ~ length * year + depth + I(depth^2) + s(xkm,ykm) + s(xkm,ykm, by = year) + offset(distance/0.625), family = poisson, data = data)
+model[[2]] <- gamm(f ~ 1 + s(xkm, ykm) + offset(off), random = list(year = ~1, length = ~ 1), family = poisson, data = data)
+model[[3]] <- gamm(f ~ 1 + s(xkm, ykm) + offset(off), random = list(year = ~1, length = ~ 1), family = poisson, data = data)
 
-m <- gamm4(f ~ length, random = ~ (1|station), family = poisson, data = data)
-m <- gamm4(f ~ 1 + offset(distance/0.625), random = ~ (1|length) + (1|year), family = poisson, data = data)
 
-m <- gamm4(f ~ 1 + s(xkm, ykm) + offset(distance/0.625), random = ~ (1|length) + (1|year), family = poisson, data = data)
+# Draw map of samples:
+map.new(xlim = c(-65.25, -61.75), ylim = c(45.5, 47.25))
+map("coastline")
+points(x$longitude, x$latitude, pch = 21, bg = "grey")
+points(grid$longitude, grid$latitude, pch = 21, bg = "red")
+map.axis(1:4)
+box()
+tmp <- deg2km(x$longitude, x$latitude)
+names(tmp) <- c("xkm", "ykm")
+x <- cbind(x, tmp)
 
 # Define variables which define the data set:
 xlim = c(-64.9, -61.75)
