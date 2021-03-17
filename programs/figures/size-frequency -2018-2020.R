@@ -5,7 +5,7 @@ library(gulf.spatial)
 # Load survey data:
 language <- language("en")
 output <- "pdf"
-years <- 2018:2019
+years <- 2019:2020
 sex <- 2
 if (sex == 1) file <- "males" else file <- "females"
 survey <- "regular"
