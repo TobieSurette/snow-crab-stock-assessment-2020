@@ -59,6 +59,7 @@ y$species[y$tow.id == "GP218F" & y$species == 8200] <- 1900
 y$number.caught[y$tow.id == "GP272F" & y$species == 4355] <- 388
 y$weight.caught[y$tow.id == "GP272F" & y$species == 4355] <- 44.1
 y$number.caught[y$tow.id == "GP351F" & y$species == 40] <- 129
+y$date[y$tow.id == "GP354F"] <- "2020-07-13"
 
 # Check individual species entries:
 i = 1
