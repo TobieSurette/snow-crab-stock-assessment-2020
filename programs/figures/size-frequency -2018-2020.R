@@ -5,7 +5,7 @@ library(gulf.spatial)
 # Load survey data:
 language <- language("en")
 output <- "pdf"
-years <- 2019:2020
+years <- 2018:2019
 sex <- 2
 if (sex == 1) file <- "males" else file <- "females"
 survey <- "regular"
@@ -34,6 +34,8 @@ if (sex == 1){
 }
 
 old <- NULL
+
+r <- list()
 for (i in 1:length(years)){
    print(years[i])
 
@@ -79,6 +81,7 @@ for (i in 1:length(years)){
       lines(as.numeric(rownames(old)), 1.35*old[, 1], col = old.col[1], lwd = 3)
    }
    old <- res
+   r[[i]] <- res
    old.col <- col
    if (sex == 1) vline(95, col = "brown3", lty = "dashed", lwd = 2)
 
