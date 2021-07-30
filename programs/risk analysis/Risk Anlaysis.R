@@ -12,15 +12,15 @@ n      <- 100000 # Number of random samples.
 
 # Bias specifications:
 range <- FALSE      # Whether to treat bias.scs as a uniform range of [0, bias.scs]
-bias.scs  <- 0.20    # Negative bias applied to snow crab survey from 2019 and 2020 estimates.
+bias.scs  <- 0.20   # Negative bias applied to snow crab survey from 2019 and 2020 estimates.
 bias.rec  <- 0.30   # Negative bias applied to recruitment predictions.
 if (range) bias.scs  <- bias.scs * runif(n) # Simulate bias for snow crab survey.
 
 # Define biomass estimates:
-BMMGE95.2020.mu    <- 77748.1  # Estimated kriged commercial biomass.
-BMMGE95.2020.sigma <- 5397.4
+BMMGE95.2020.mu    <- 77748.1  # Kriged commercial biomass.
+BMMGE95.2020.sigma <- 5397.4   # Standard error of kriged commercial biomass
 BREC.2021.mu       <- 79870    # Projected R-1 recruitment from the Bayesian projection model.
-BREC.2021.sigma    <- 15980
+BREC.2021.sigma    <- 15980    # Standard error or projected R-1 recruitment.
 
 # Define function for simulating from a log-normal distribution with specified mean and error:
 rlnorm <- function(n, mu, sigma){
@@ -66,8 +66,8 @@ BREC.2021    <- rlnorm(n, (1 - bias.rec) * BREC.2021.mu, (1 - bias.rec) * BREC.2
 S <- mean(apply(1-mortality[, (ncol(mortality)-4):ncol(mortality)], 1, mean))
 
 # Define vector of catch options:
-catch <- c(seq(0, 100, by = 0.25) * 1000 , quota)
-catch <- c(catch[catch < quota], quota, catch[catch > quota])
+catch <- c(seq(0, 100, by = 0.25) * 1000 , TAC)
+catch <- c(catch[catch < TAC], TAC, catch[catch > TAC])
 
 # Calculate remaining biomass for 2021:
 BREM.2021 <- repvec(BMMGE95.2020 * S, ncol = length(catch)) - repvec(catch, nrow = n)
@@ -93,7 +93,7 @@ tab <- data.frame(catch = catch,
 # Probability of exceeding ER plot:
 if (language == "english"){
    ylab <- "Probability"
-   xlab <- "Catch options (x 1000t)"
+   xlab <- "Catch option (x 1000t)"
    legend.str <- c("Brem < Blim", "B < Busr")
 }
 if (language == "french"){
@@ -103,14 +103,15 @@ if (language == "french"){
 }
 if (language == "bilingual"){
    ylab <- "Probability / Probabilit?"
-   xlab <- "Catch options / Niveau de capture (x 1000t)"
+   xlab <- "Catch option / Niveau de capture (x 1000t)"
    legend.str <- c("Brem/Bres < Blim", "B < Busr/Bnrs")
 }
 
 clg()
 dev.new(width = 11, height = 7)
-plot(tab$catch / 1000, tab$P.lim, xlab = xlab, ylab = ylab, cex.lab = 1.5, type = "n", lwd = 2, col = "red", yaxs = "i", ylim = c(0, 1.05), cex.axis = 1.25, las = 1)
+plot(range(tab$catch) / 1000, c(0,1), xlab = xlab, ylab = ylab, cex.lab = 1.5, type = "n", lwd = 2, col = "red", yaxs = "i", ylim = c(0, 1.00), cex.axis = 1.25, las = 1)
 grid()
+lines(tab$catch / 1000, tab$P.lim, xlab = xlab, ylab = ylab, cex.lab = 1.5, lwd = 3, col = "black", lty = "solid")
 lines(tab$catch / 1000, tab$P.usr, xlab = xlab, ylab = ylab, cex.lab = 1.5, lwd = 3, col = "blue", lty = "dashed")
 legend("bottomright", legend = legend.str, bg = "white", lwd = 2, col = c("black", "blue"), cex = 1.5, lty = c("solid", "dashed"))
 box()
