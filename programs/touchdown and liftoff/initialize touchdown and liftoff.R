@@ -14,6 +14,7 @@ layout(m)
 par(mar = c(0, 0, 0, 0))
 tows <- which(is.na(res$touchdown) | is.na(res$liftoff) | res$touchdown == "        " | res$liftoff == "        ")
 for (i in tows){
+   print(x$tow.id[i])
    s <- read.star.oddi(x[i, ], probe = "footrope")
    if (!("tilt-x" %in% names(s))) s <- NULL
    h <- read.star.oddi(x[i, ], probe = "headline")

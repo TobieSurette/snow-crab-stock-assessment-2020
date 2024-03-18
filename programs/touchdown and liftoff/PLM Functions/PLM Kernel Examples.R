@@ -78,9 +78,9 @@ for (i in 1:5){
    if (i %in% 1:5) axis(2, at = seq(0, 1, by = 0.2), cex.axis = 0.8)
    if (i == 5) axis(1, at = round(seq(-1., 1., by = 0.25)*100)/100, cex.axis = 0.8, padj = -0.9)
    if (i == 3) mtext("Value", 2, 2.5, cex = 1.5)
-   if (i == 2) text(0, 0.65, bquote(f(x) == frac(1,2)))
-   if (i == 3){ text(-0.7, 0.65, bquote(f(x) == 1 + x));  text(0.70, 0.65, bquote(f(x) == 1 - x)) }
-   if (i == 4) text(0.0, 0.9, bquote(f(x) == frac(3 * (1 - x^2),4)))
+   if (i == 2)   text(0, 0.65, bquote(f(x) == frac(1,2)))
+   if (i == 3){  text(-0.7, 0.65, bquote(f(x) == 1 + x));  text(0.70, 0.65, bquote(f(x) == 1 - x)) }
+   if (i == 4)   text(0.0, 0.9, bquote(f(x) == frac(3 * (1 - x^2),4)))
    if (i == 5) { text(-0.7, 0.55, bquote(f(x) == -2 * x ^ 3 - 3 * x ^ 2 + 1));  text(0.70, 0.55, bquote(f(x) == 2 * x ^ 3 - 3 * x ^ 2 + 1)) }
 }
 for (i in 1:5){
@@ -116,11 +116,11 @@ for (i in 1:5){
    if (i == 1) mtext("PLM", 3, 1.0, cex = 1.25)
    if (i == 5) axis(1, at = round(seq(-1.0, 1.0, by = 0.25)*100)/100, cex.axis = 0.8, padj = -0.9)
 
-   if (i == 1){ text(-0.7, 0.1, bquote(f(x) == 0));  text(0.45, 0.75, bquote(f(x) == x)) }
-   if (i == 2){ text(-0.1, 0.5, bquote(f(x) == frac((x + 1)^2, 4))) }
-   if (i == 3){ text(-0.5, 0.25, bquote(f(x) == frac((1 + x)^3, 6))); text(0.5, 0.80, bquote(f(x) == frac((1 - x)^3, 6) + x)) }
+   if (i == 1){ text(-0.7, 0.1,   bquote(f(x) == 0));  text(0.45, 0.75, bquote(f(x) == x)) }
+   if (i == 2){ text(-0.1, 0.5,   bquote(f(x) == frac((x + 1)^2, 4))) }
+   if (i == 3){ text(-0.5, 0.25,  bquote(f(x) == frac((1 + x)^3, 6))); text(0.5, 0.80, bquote(f(x) == frac((1 - x)^3, 6) + x)) }
    if (i == 4){ text(-0.25, 0.55, bquote(f(x) == frac(- x ^4 + 6 * x ^ 2 + 8 * x + 3, 16))) }
    if (i == 5){ text(-0.55, 0.67, bquote(f(x) == frac(- 2 * x ^ 5 - 5 * x ^ 4 + 10 * x ^ 2 + 10 * x + 3, 20)), cex = 0.8);
-                text(0.55, 0.33, bquote(f(x) == frac(  2 * x ^ 5 - 5 * x ^ 4 + 10 * x ^ 2 + 10 * x + 3, 20)), cex = 0.8)}
+                text(0.55, 0.33,  bquote(f(x) == frac(  2 * x ^ 5 - 5 * x ^ 4 + 10 * x ^ 2 + 10 * x + 3, 20)), cex = 0.8)}
 }
 

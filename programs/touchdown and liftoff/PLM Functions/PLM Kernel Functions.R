@@ -57,7 +57,7 @@ transition <- function(x, skewness = 0, degree = 0, xp = 0, width = 2, range){
 }
 
 sigmoid <- function(x, skewness = 0, degree = 0, xp = 0, width = 2, range){
-   # SIGMOID - Sigmoid kernel (1st order derivative) for piecewise linear models.
+   # SIGMOID - Sigmoid kernel (1st order derivative) for piece-wise linear models.
 
    # Convert skewness to proportions:
    p <- 1 / (1+exp(-skewness))
@@ -65,8 +65,8 @@ sigmoid <- function(x, skewness = 0, degree = 0, xp = 0, width = 2, range){
    # Location and scale transforms:
    if (!missing(range)){
       width <- diff(range)
-      xlim <- c(xp-(1-p)*width, xp+p*width) # Domain bounds.
-      xp <- range[1] + (xp-xlim[1])
+      xlim  <- c(xp - (1-p) * width, xp + p * width) # Domain bounds.
+      xp    <- range[1] + (xp - xlim[1])
    }
    x <- (2 * (x-xp)) / width
 
@@ -122,7 +122,7 @@ sigmoid <- function(x, skewness = 0, degree = 0, xp = 0, width = 2, range){
 }
 
 plm <- function(x, skewness = 0, degree = 1, xp = 0, width = 2, range){
-   # PLM - Piecewise linear model kernels.
+   # PLM - Piece-wise linear model kernels.
 
    # Standard piecewise linear model (deg = 1):
    v <- rep(0, length(x))
